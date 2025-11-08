@@ -1,0 +1,32 @@
+{
+  "name": "pousada-praia-bela",
+  "version": "1.0.0",
+  "description": "Site elegante e moderno para a Pousada Praia Bela - Ilhéus/BA",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start"
+  },
+  "keywords": [
+    "pousada",
+    "hotel",
+    "ilheus",
+    "bahia",
+    "react",
+    "vite",
+    "tailwind"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
