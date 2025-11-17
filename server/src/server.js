@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit'
 import dotenv from 'dotenv'
 import { initDatabase } from './config/database.js'
 
+
 // Routes
 import authRoutes from './routes/auth.js'
 import promotionsRoutes from './routes/promotions.js'

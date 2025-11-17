@@ -16,7 +16,7 @@ router.post('/login', async (req, res) => {
     }
 
     // Find admin
-    const admin = db.prepare('SELECT * FROM admins WHERE email = ?').get(email)
+    const admin = await db.prepare('SELECT * FROM admins WHERE email = $1').get(email)
 
     if (!admin) {
       return res.status(401).json({ message: 'Credenciais inválidas' })
@@ -51,9 +51,9 @@ router.post('/login', async (req, res) => {
 })
 
 // Verify token
-router.get('/verify', authMiddleware, (req, res) => {
+router.get('/verify', authMiddleware, async (req, res) => {
   try {
-    const admin = db.prepare('SELECT id, email, name FROM admins WHERE id = ?').get(req.adminId)
+    const admin = await db.prepare('SELECT id, email, name FROM admins WHERE id = $1').get(req.adminId)
 
     if (!admin) {
       return res.status(404).json({ message: 'Admin não encontrado' })

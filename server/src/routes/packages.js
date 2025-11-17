@@ -5,9 +5,9 @@ import { authMiddleware } from '../middleware/auth.js'
 const router = express.Router()
 
 // Get all packages (public)
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const packages = db.prepare('SELECT * FROM packages WHERE is_active = 1 ORDER BY is_featured DESC, created_at DESC').all()
+    const packages = await db.prepare('SELECT * FROM packages WHERE is_active = 1 ORDER BY is_featured DESC, created_at DESC').all()
 
     // Parse JSON fields
     const parsedPackages = packages.map(pkg => ({
@@ -24,9 +24,9 @@ router.get('/', (req, res) => {
 })
 
 // Get single package (public)
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const pkg = db.prepare('SELECT * FROM packages WHERE id = ?').get(req.params.id)
+    const pkg = await db.prepare('SELECT * FROM packages WHERE id = $1').get(req.params.id)
 
     if (!pkg) {
       return res.status(404).json({ message: 'Pacote não encontrado' })
@@ -46,7 +46,7 @@ router.get('/:id', (req, res) => {
 })
 
 // Create package (admin only)
-router.post('/', authMiddleware, (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   try {
     const { name, description, price, inclusions, image_urls, is_featured, is_active } = req.body
 
@@ -54,9 +54,9 @@ router.post('/', authMiddleware, (req, res) => {
       return res.status(400).json({ message: 'Campos obrigatórios faltando' })
     }
 
-    const result = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO packages (name, description, price, inclusions, image_urls, is_featured, is_active)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
     `).run(
       name,
       description,
@@ -67,7 +67,7 @@ router.post('/', authMiddleware, (req, res) => {
       is_active !== undefined ? is_active : 1
     )
 
-    const newPackage = db.prepare('SELECT * FROM packages WHERE id = ?').get(result.lastInsertRowid)
+    const newPackage = await db.prepare('SELECT * FROM packages WHERE id = $1').get(result.lastInsertRowid)
 
     const parsed = {
       ...newPackage,
@@ -83,20 +83,20 @@ router.post('/', authMiddleware, (req, res) => {
 })
 
 // Update package (admin only)
-router.put('/:id', authMiddleware, (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
   try {
     const { name, description, price, inclusions, image_urls, is_featured, is_active } = req.body
 
-    const exists = db.prepare('SELECT id FROM packages WHERE id = ?').get(req.params.id)
+    const exists = await db.prepare('SELECT id FROM packages WHERE id = $1').get(req.params.id)
 
     if (!exists) {
       return res.status(404).json({ message: 'Pacote não encontrado' })
     }
 
-    db.prepare(`
+    await db.prepare(`
       UPDATE packages
-      SET name = ?, description = ?, price = ?, inclusions = ?, image_urls = ?, is_featured = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP
-      WHERE id = ?
+      SET name = $1, description = $2, price = $3, inclusions = $4, image_urls = $5, is_featured = $6, is_active = $7, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $8
     `).run(
       name,
       description,
@@ -108,7 +108,7 @@ router.put('/:id', authMiddleware, (req, res) => {
       req.params.id
     )
 
-    const updated = db.prepare('SELECT * FROM packages WHERE id = ?').get(req.params.id)
+    const updated = await db.prepare('SELECT * FROM packages WHERE id = $1').get(req.params.id)
 
     const parsed = {
       ...updated,
@@ -124,15 +124,15 @@ router.put('/:id', authMiddleware, (req, res) => {
 })
 
 // Delete package (admin only)
-router.delete('/:id', authMiddleware, (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
   try {
-    const exists = db.prepare('SELECT id FROM packages WHERE id = ?').get(req.params.id)
+    const exists = await db.prepare('SELECT id FROM packages WHERE id = $1').get(req.params.id)
 
     if (!exists) {
       return res.status(404).json({ message: 'Pacote não encontrado' })
     }
 
-    db.prepare('DELETE FROM packages WHERE id = ?').run(req.params.id)
+    await db.prepare('DELETE FROM packages WHERE id = $1').run(req.params.id)
 
     res.json({ message: 'Pacote deletado com sucesso' })
   } catch (error) {

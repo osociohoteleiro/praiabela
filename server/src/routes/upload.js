@@ -21,9 +21,9 @@ router.post('/image', authMiddleware, (req, res) => {
       const result = await uploadToS3(req.file, 'images')
 
       // Save to database
-      db.prepare(`
+      await db.prepare(`
         INSERT INTO media (type, category, url, s3_key, filename, size)
-        VALUES (?, ?, ?, ?, ?, ?)
+        VALUES ($1, $2, $3, $4, $5, $6)
       `).run('image', req.body.category || 'general', result.url, result.key, result.filename, req.file.size)
 
       res.json({
@@ -52,9 +52,9 @@ router.post('/video', authMiddleware, (req, res) => {
       const result = await uploadToS3(req.file, 'videos')
 
       // Save to database
-      db.prepare(`
+      await db.prepare(`
         INSERT INTO media (type, category, url, s3_key, filename, size)
-        VALUES (?, ?, ?, ?, ?, ?)
+        VALUES ($1, $2, $3, $4, $5, $6)
       `).run('video', req.body.category || 'hero', result.url, result.key, result.filename, req.file.size)
 
       res.json({
@@ -86,12 +86,12 @@ router.post('/images', authMiddleware, (req, res) => {
       // Save to database
       const stmt = db.prepare(`
         INSERT INTO media (type, category, url, s3_key, filename, size)
-        VALUES (?, ?, ?, ?, ?, ?)
+        VALUES ($1, $2, $3, $4, $5, $6)
       `)
 
-      results.forEach((result, index) => {
-        stmt.run('image', req.body.category || 'gallery', result.url, result.key, result.filename, req.files[index].size)
-      })
+      for (let i = 0; i < results.length; i++) {
+        await stmt.run('image', req.body.category || 'gallery', results[i].url, results[i].key, results[i].filename, req.files[i].size)
+      }
 
       res.json({
         message: `${results.length} arquivos enviados com sucesso`,
@@ -113,7 +113,7 @@ router.delete('/:key(*)', authMiddleware, async (req, res) => {
     await deleteFromS3(key)
 
     // Delete from database
-    db.prepare('DELETE FROM media WHERE s3_key = ?').run(key)
+    await db.prepare('DELETE FROM media WHERE s3_key = $1').run(key)
 
     res.json({ message: 'Arquivo deletado com sucesso' })
   } catch (error) {
