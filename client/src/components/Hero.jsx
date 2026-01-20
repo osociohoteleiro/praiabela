@@ -20,11 +20,14 @@ const Hero = () => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
     }
+  }
 
-    timeoutRef.current = setTimeout(() => {
-      setIsInteracting(false)
-      window.dispatchEvent(new CustomEvent('tourInteraction', { detail: false }))
-    }, 10000)
+  const exitTour = () => {
+    setIsInteracting(false)
+    window.dispatchEvent(new CustomEvent('tourInteraction', { detail: false }))
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
   }
 
   // Cleanup timeout on unmount
@@ -91,7 +94,7 @@ const Hero = () => {
       {/* Scroll Indicator */}
       <div
         className={`absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce z-[15] transition-opacity duration-300 ${
-          isInteracting ? 'opacity-0' : 'opacity-100'
+          isInteracting ? 'opacity-0 pointer-events-none' : 'opacity-100'
         }`}
       >
         <svg
@@ -106,6 +109,19 @@ const Hero = () => {
           <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
         </svg>
       </div>
+
+      {/* Botão Sair do Tour */}
+      <button
+        onClick={exitTour}
+        className={`absolute bottom-10 left-1/2 transform -translate-x-1/2 z-[70] bg-white/90 hover:bg-white text-gray-800 font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 flex items-center gap-2 ${
+          isInteracting ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+        }`}
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        Sair do Tour
+      </button>
     </div>
   )
 }

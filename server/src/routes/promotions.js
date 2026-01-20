@@ -5,9 +5,9 @@ import { authMiddleware } from '../middleware/auth.js'
 const router = express.Router()
 
 // Get all promotions (public)
-router.get('/', async (req, res) => {
+router.get('/', (req, res) => {
   try {
-    const promotions = await db.prepare('SELECT * FROM promotions WHERE is_active = 1 ORDER BY created_at DESC').all()
+    const promotions = db.prepare('SELECT * FROM promotions WHERE is_active = 1 ORDER BY created_at DESC').all()
     res.json(promotions)
   } catch (error) {
     console.error('Get promotions error:', error)
@@ -16,9 +16,9 @@ router.get('/', async (req, res) => {
 })
 
 // Get single promotion (public)
-router.get('/:id', async (req, res) => {
+router.get('/:id', (req, res) => {
   try {
-    const promotion = await db.prepare('SELECT * FROM promotions WHERE id = $1').get(req.params.id)
+    const promotion = db.prepare('SELECT * FROM promotions WHERE id = ?').get(req.params.id)
 
     if (!promotion) {
       return res.status(404).json({ message: 'Promoção não encontrada' })
@@ -32,7 +32,7 @@ router.get('/:id', async (req, res) => {
 })
 
 // Create promotion (admin only)
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, (req, res) => {
   try {
     const { title, description, discount, valid_until, image_url, is_active } = req.body
 
@@ -40,12 +40,12 @@ router.post('/', authMiddleware, async (req, res) => {
       return res.status(400).json({ message: 'Campos obrigatórios faltando' })
     }
 
-    const result = await db.prepare(`
+    const result = db.prepare(`
       INSERT INTO promotions (title, description, discount, valid_until, image_url, is_active)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      VALUES (?, ?, ?, ?, ?, ?)
     `).run(title, description, discount, valid_until || null, image_url || null, is_active !== undefined ? is_active : 1)
 
-    const newPromotion = await db.prepare('SELECT * FROM promotions WHERE id = $1').get(result.lastInsertRowid)
+    const newPromotion = db.prepare('SELECT * FROM promotions WHERE id = ?').get(result.lastInsertRowid)
 
     res.status(201).json(newPromotion)
   } catch (error) {
@@ -55,23 +55,23 @@ router.post('/', authMiddleware, async (req, res) => {
 })
 
 // Update promotion (admin only)
-router.put('/:id', authMiddleware, async (req, res) => {
+router.put('/:id', authMiddleware, (req, res) => {
   try {
     const { title, description, discount, valid_until, image_url, is_active } = req.body
 
-    const exists = await db.prepare('SELECT id FROM promotions WHERE id = $1').get(req.params.id)
+    const exists = db.prepare('SELECT id FROM promotions WHERE id = ?').get(req.params.id)
 
     if (!exists) {
       return res.status(404).json({ message: 'Promoção não encontrada' })
     }
 
-    await db.prepare(`
+    db.prepare(`
       UPDATE promotions
-      SET title = $1, description = $2, discount = $3, valid_until = $4, image_url = $5, is_active = $6, updated_at = CURRENT_TIMESTAMP
-      WHERE id = $7
+      SET title = ?, description = ?, discount = ?, valid_until = ?, image_url = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
     `).run(title, description, discount, valid_until || null, image_url || null, is_active !== undefined ? is_active : 1, req.params.id)
 
-    const updated = await db.prepare('SELECT * FROM promotions WHERE id = $1').get(req.params.id)
+    const updated = db.prepare('SELECT * FROM promotions WHERE id = ?').get(req.params.id)
 
     res.json(updated)
   } catch (error) {
@@ -81,15 +81,15 @@ router.put('/:id', authMiddleware, async (req, res) => {
 })
 
 // Delete promotion (admin only)
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', authMiddleware, (req, res) => {
   try {
-    const exists = await db.prepare('SELECT id FROM promotions WHERE id = $1').get(req.params.id)
+    const exists = db.prepare('SELECT id FROM promotions WHERE id = ?').get(req.params.id)
 
     if (!exists) {
       return res.status(404).json({ message: 'Promoção não encontrada' })
     }
 
-    await db.prepare('DELETE FROM promotions WHERE id = $1').run(req.params.id)
+    db.prepare('DELETE FROM promotions WHERE id = ?').run(req.params.id)
 
     res.json({ message: 'Promoção deletada com sucesso' })
   } catch (error) {

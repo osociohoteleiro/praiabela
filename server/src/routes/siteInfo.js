@@ -5,9 +5,9 @@ import { authMiddleware } from '../middleware/auth.js'
 const router = express.Router()
 
 // Get site info (public)
-router.get('/', async (req, res) => {
+router.get('/', (req, res) => {
   try {
-    const siteInfo = await db.prepare('SELECT * FROM site_info WHERE id = 1').get()
+    const siteInfo = db.prepare('SELECT * FROM site_info WHERE id = 1').get()
 
     if (!siteInfo) {
       return res.status(404).json({ message: 'Informações do site não encontradas' })
@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
 })
 
 // Update site info (admin only)
-router.put('/', authMiddleware, async (req, res) => {
+router.put('/', authMiddleware, (req, res) => {
   try {
     const {
       about_text,
@@ -37,19 +37,19 @@ router.put('/', authMiddleware, async (req, res) => {
       logo_url,
     } = req.body
 
-    await db.prepare(`
+    db.prepare(`
       UPDATE site_info
-      SET about_text = $1,
-          contact_email = $2,
-          contact_phone = $3,
-          contact_address = $4,
-          check_in_time = $5,
-          check_out_time = $6,
-          facebook_url = $7,
-          instagram_url = $8,
-          whatsapp_number = $9,
-          hero_video_url = $10,
-          logo_url = $11,
+      SET about_text = ?,
+          contact_email = ?,
+          contact_phone = ?,
+          contact_address = ?,
+          check_in_time = ?,
+          check_out_time = ?,
+          facebook_url = ?,
+          instagram_url = ?,
+          whatsapp_number = ?,
+          hero_video_url = ?,
+          logo_url = ?,
           updated_at = CURRENT_TIMESTAMP
       WHERE id = 1
     `).run(
@@ -66,7 +66,7 @@ router.put('/', authMiddleware, async (req, res) => {
       logo_url || null
     )
 
-    const updated = await db.prepare('SELECT * FROM site_info WHERE id = 1').get()
+    const updated = db.prepare('SELECT * FROM site_info WHERE id = 1').get()
 
     res.json(updated)
   } catch (error) {

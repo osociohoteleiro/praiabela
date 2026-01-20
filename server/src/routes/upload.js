@@ -21,9 +21,9 @@ router.post('/image', authMiddleware, (req, res) => {
       const result = await uploadToS3(req.file, 'images')
 
       // Save to database
-      await db.prepare(`
+      db.prepare(`
         INSERT INTO media (type, category, url, s3_key, filename, size)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        VALUES (?, ?, ?, ?, ?, ?)
       `).run('image', req.body.category || 'general', result.url, result.key, result.filename, req.file.size)
 
       res.json({
@@ -52,9 +52,9 @@ router.post('/video', authMiddleware, (req, res) => {
       const result = await uploadToS3(req.file, 'videos')
 
       // Save to database
-      await db.prepare(`
+      db.prepare(`
         INSERT INTO media (type, category, url, s3_key, filename, size)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        VALUES (?, ?, ?, ?, ?, ?)
       `).run('video', req.body.category || 'hero', result.url, result.key, result.filename, req.file.size)
 
       res.json({
@@ -86,11 +86,11 @@ router.post('/images', authMiddleware, (req, res) => {
       // Save to database
       const stmt = db.prepare(`
         INSERT INTO media (type, category, url, s3_key, filename, size)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        VALUES (?, ?, ?, ?, ?, ?)
       `)
 
       for (let i = 0; i < results.length; i++) {
-        await stmt.run('image', req.body.category || 'gallery', results[i].url, results[i].key, results[i].filename, req.files[i].size)
+        stmt.run('image', req.body.category || 'gallery', results[i].url, results[i].key, results[i].filename, req.files[i].size)
       }
 
       res.json({
@@ -113,7 +113,7 @@ router.delete('/:key(*)', authMiddleware, async (req, res) => {
     await deleteFromS3(key)
 
     // Delete from database
-    await db.prepare('DELETE FROM media WHERE s3_key = $1').run(key)
+    db.prepare('DELETE FROM media WHERE s3_key = ?').run(key)
 
     res.json({ message: 'Arquivo deletado com sucesso' })
   } catch (error) {
