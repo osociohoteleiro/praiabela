@@ -11,9 +11,10 @@ import { initDatabase } from './config/database.js'
 import authRoutes from './routes/auth.js'
 import promotionsRoutes from './routes/promotions.js'
 import packagesRoutes from './routes/packages.js'
+import roomsRoutes from './routes/rooms.js'
 import siteInfoRoutes from './routes/siteInfo.js'
 import uploadRoutes from './routes/upload.js'
-import mediaRoutes from './routes/media.js'
+import galleryRoutes from './routes/gallery.js'
 
 dotenv.config()
 
@@ -56,9 +57,10 @@ app.use(compression())
 app.use('/api/auth', authRoutes)
 app.use('/api/promotions', promotionsRoutes)
 app.use('/api/packages', packagesRoutes)
+app.use('/api/rooms', roomsRoutes)
 app.use('/api/site-info', siteInfoRoutes)
 app.use('/api/upload', uploadRoutes)
-app.use('/api/media', mediaRoutes)
+app.use('/api/gallery', galleryRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {

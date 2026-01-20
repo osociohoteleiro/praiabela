@@ -10,8 +10,9 @@ const AdminLogin = lazy(() => import('./pages/Admin/Login'))
 const AdminDashboard = lazy(() => import('./pages/Admin/Dashboard'))
 const AdminPromotions = lazy(() => import('./pages/Admin/Promotions'))
 const AdminPackages = lazy(() => import('./pages/Admin/Packages'))
+const AdminRooms = lazy(() => import('./pages/Admin/Rooms'))
 const AdminSiteInfo = lazy(() => import('./pages/Admin/SiteInfo'))
-const AdminMedia = lazy(() => import('./pages/Admin/MediaManager'))
+const AdminGallery = lazy(() => import('./pages/Admin/GalleryManager'))
 
 // Protected Route Component
 import ProtectedRoute from './components/ProtectedRoute'
@@ -62,6 +63,14 @@ function App() {
               }
             />
             <Route
+              path="/admin/rooms"
+              element={
+                <ProtectedRoute>
+                  <AdminRooms />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/admin/site-info"
               element={
                 <ProtectedRoute>
@@ -70,10 +79,10 @@ function App() {
               }
             />
             <Route
-              path="/admin/media"
+              path="/admin/gallery"
               element={
                 <ProtectedRoute>
-                  <AdminMedia />
+                  <AdminGallery />
                 </ProtectedRoute>
               }
             />

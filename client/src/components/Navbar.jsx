@@ -4,14 +4,23 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isTourActive, setIsTourActive] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50)
     }
 
+    const handleTourInteraction = (e) => {
+      setIsTourActive(e.detail)
+    }
+
     window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    window.addEventListener('tourInteraction', handleTourInteraction)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('tourInteraction', handleTourInteraction)
+    }
   }, [])
 
   const navLinks = [
@@ -33,27 +42,33 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`absolute top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`absolute top-0 transition-all duration-300 ${
+        isTourActive
+          ? 'z-0 opacity-0 pointer-events-none'
+          : 'z-50'
+      } ${
         isScrolled
-          ? 'bg-white/95 backdrop-blur-sm shadow-lg py-4'
-          : 'bg-transparent py-6'
+          ? 'left-0 right-0 bg-white/95 backdrop-blur-sm shadow-lg py-4'
+          : 'right-0 bg-transparent py-6'
       }`}
     >
-      <div className="container-custom">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <a
-            href="#home"
-            onClick={(e) => {
-              e.preventDefault()
-              window.scrollTo({ top: 0, behavior: 'smooth' })
-            }}
-            className="font-display text-2xl md:text-3xl font-bold"
-          >
-            <span className={isScrolled ? 'text-gradient-warm' : 'text-white drop-shadow-lg'}>
-              Praia Bela
-            </span>
-          </a>
+      <div className={isScrolled ? 'container-custom' : 'px-4 md:px-8'}>
+        <div className="flex items-center justify-end">
+          {/* Logo - only visible when scrolled */}
+          {isScrolled && (
+            <a
+              href="#home"
+              onClick={(e) => {
+                e.preventDefault()
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              }}
+              className="font-display text-2xl md:text-3xl font-bold mr-auto"
+            >
+              <span className="text-gradient-warm">
+                Praia Bela
+              </span>
+            </a>
+          )}
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-8">

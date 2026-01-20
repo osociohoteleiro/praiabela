@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AdminLayout from '../../components/AdminLayout'
-import { promotionsAPI, packagesAPI, mediaAPI } from '../../services/api'
+import { promotionsAPI, packagesAPI } from '../../services/api'
 import {
   TagIcon,
   CubeIcon,
-  PhotoIcon,
   ChartBarIcon,
 } from '@heroicons/react/24/outline'
 
@@ -13,7 +12,6 @@ const Dashboard = () => {
   const [stats, setStats] = useState({
     promotions: 0,
     packages: 0,
-    media: 0,
   })
   const [loading, setLoading] = useState(true)
 
@@ -23,16 +21,14 @@ const Dashboard = () => {
 
   const loadStats = async () => {
     try {
-      const [promotionsRes, packagesRes, mediaRes] = await Promise.all([
+      const [promotionsRes, packagesRes] = await Promise.all([
         promotionsAPI.getAll(),
         packagesAPI.getAll(),
-        mediaAPI.getAll(),
       ])
 
       setStats({
         promotions: promotionsRes.data.length,
         packages: packagesRes.data.length,
-        media: mediaRes.data.length,
       })
     } catch (error) {
       console.error('Error loading stats:', error)
@@ -55,13 +51,6 @@ const Dashboard = () => {
       icon: CubeIcon,
       color: 'bg-secondary-500',
       link: '/admin/packages',
-    },
-    {
-      name: 'Arquivos de Mídia',
-      value: stats.media,
-      icon: PhotoIcon,
-      color: 'bg-ocean-500',
-      link: '/admin/media',
     },
   ]
 
@@ -127,14 +116,6 @@ const Dashboard = () => {
             >
               <h3 className="font-semibold text-gray-900 mb-1">Novo Pacote</h3>
               <p className="text-sm text-gray-600">Adicionar um novo pacote especial</p>
-            </Link>
-
-            <Link
-              to="/admin/media"
-              className="p-4 border-2 border-gray-200 rounded-lg hover:border-ocean-500 hover:bg-ocean-50 transition-all"
-            >
-              <h3 className="font-semibold text-gray-900 mb-1">Upload de Mídia</h3>
-              <p className="text-sm text-gray-600">Fazer upload de fotos e vídeos</p>
             </Link>
 
             <Link

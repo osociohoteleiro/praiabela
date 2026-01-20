@@ -57,6 +57,16 @@ export const packagesAPI = {
   delete: (id) => api.delete(`/packages/${id}`),
 }
 
+// Rooms endpoints
+export const roomsAPI = {
+  getAll: () => api.get('/rooms'),
+  getAllAdmin: () => api.get('/rooms/admin/all'),
+  getById: (id) => api.get(`/rooms/${id}`),
+  create: (data) => api.post('/rooms', data),
+  update: (id, data) => api.put(`/rooms/${id}`, data),
+  delete: (id) => api.delete(`/rooms/${id}`),
+}
+
 // Site Info endpoints
 export const siteInfoAPI = {
   get: () => api.get('/site-info'),
@@ -73,6 +83,16 @@ export const mediaAPI = {
   }),
   getAll: () => api.get('/media'),
   delete: (key) => api.delete(`/upload/${key}`),
+}
+
+// Gallery endpoints
+export const galleryAPI = {
+  getAll: () => api.get('/gallery'),
+  getAllAdmin: () => api.get('/gallery/admin/all'),
+  create: (data) => api.post('/gallery', data),
+  update: (id, data) => api.put(`/gallery/${id}`, data),
+  delete: (id) => api.delete(`/gallery/${id}`),
+  reorder: (items) => api.put('/gallery/reorder/batch', { items }),
 }
 
 export default api

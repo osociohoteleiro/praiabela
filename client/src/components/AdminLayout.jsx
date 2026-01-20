@@ -4,9 +4,10 @@ import {
   HomeIcon,
   TagIcon,
   CubeIcon,
+  HomeModernIcon,
   InformationCircleIcon,
-  PhotoIcon,
   ArrowLeftOnRectangleIcon,
+  RectangleStackIcon,
 } from '@heroicons/react/24/outline'
 
 const AdminLayout = ({ children }) => {
@@ -18,8 +19,9 @@ const AdminLayout = ({ children }) => {
     { name: 'Dashboard', path: '/admin/dashboard', icon: HomeIcon },
     { name: 'Promoções', path: '/admin/promotions', icon: TagIcon },
     { name: 'Pacotes', path: '/admin/packages', icon: CubeIcon },
+    { name: 'Quartos', path: '/admin/rooms', icon: HomeModernIcon },
     { name: 'Info do Site', path: '/admin/site-info', icon: InformationCircleIcon },
-    { name: 'Mídia', path: '/admin/media', icon: PhotoIcon },
+    { name: 'Galeria', path: '/admin/gallery', icon: RectangleStackIcon },
   ]
 
   const handleLogout = () => {
