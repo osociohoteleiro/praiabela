@@ -1,11 +1,5 @@
 /**
  * Script para migrar dados do banco local para produção via API
- *
- * Uso: node scripts/migrate-to-production.js
- *
- * Antes de executar:
- * 1. Defina a URL da API de produção
- * 2. Faça login no admin e copie o token
  */
 
 import Database from 'better-sqlite3';
@@ -15,31 +9,17 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// ============================================
-// CONFIGURAÇÃO - ALTERE AQUI
-// ============================================
 const PRODUCTION_API = 'https://osh-ia-praia-bela-api.d32pnk.easypanel.host/api';
-const ADMIN_TOKEN = ''; // Cole o token JWT aqui após fazer login
-
-// ============================================
+const ADMIN_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBwcmFpYWJlbGEuY29tIiwiaWF0IjoxNzY4OTU0OTc1LCJleHAiOjE3Njk1NTk3NzV9.FpCKldY3Pk4VccINK31kMd8vUpjHCXLId3JOo0wDFtc';
 
 const dbPath = join(__dirname, '../database/praiabela.db');
 const db = new Database(dbPath);
 
-async function migrate() {
-  if (!ADMIN_TOKEN) {
-    console.log('❌ Você precisa definir o ADMIN_TOKEN!');
-    console.log('');
-    console.log('1. Acesse: https://praiabela.pages.dev/admin');
-    console.log('2. Faça login');
-    console.log('3. Abra o DevTools (F12) > Application > Local Storage');
-    console.log('4. Copie o valor de "admin_token"');
-    console.log('5. Cole no ADMIN_TOKEN neste script');
-    return;
-  }
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+async function migrate() {
   const headers = {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json; charset=utf-8',
     'Authorization': `Bearer ${ADMIN_TOKEN}`
   };
 
@@ -61,7 +41,7 @@ async function migrate() {
           price: room.price,
           amenities: JSON.parse(room.amenities || '[]'),
           image_urls: JSON.parse(room.image_urls || '[]'),
-          is_active: true
+          is_active: 1
         })
       });
       if (response.ok) {
@@ -73,6 +53,7 @@ async function migrate() {
     } catch (e) {
       console.log(`  ❌ ${room.name}: ${e.message}`);
     }
+    await sleep(200); // Delay entre requisições
   }
 
   // Migrar Gallery
@@ -87,7 +68,7 @@ async function migrate() {
           url: item.url,
           caption: item.caption,
           display_order: item.display_order,
-          is_active: true
+          is_active: 1
         })
       });
       if (response.ok) {
@@ -99,6 +80,7 @@ async function migrate() {
     } catch (e) {
       console.log(`  ❌ ${item.caption}: ${e.message}`);
     }
+    await sleep(200);
   }
 
   // Migrar Packages
@@ -115,8 +97,8 @@ async function migrate() {
           price: pkg.price,
           inclusions: JSON.parse(pkg.inclusions || '[]'),
           image_urls: JSON.parse(pkg.image_urls || '[]'),
-          is_featured: pkg.is_featured === 1,
-          is_active: true
+          is_featured: pkg.is_featured === 1 ? 1 : 0,
+          is_active: 1
         })
       });
       if (response.ok) {
@@ -128,6 +110,7 @@ async function migrate() {
     } catch (e) {
       console.log(`  ❌ ${pkg.name}: ${e.message}`);
     }
+    await sleep(200);
   }
 
   // Migrar Promotions
@@ -144,7 +127,7 @@ async function migrate() {
           discount: promo.discount,
           valid_until: promo.valid_until,
           image_url: promo.image_url,
-          is_active: true
+          is_active: 1
         })
       });
       if (response.ok) {
@@ -156,6 +139,7 @@ async function migrate() {
     } catch (e) {
       console.log(`  ❌ ${promo.title}: ${e.message}`);
     }
+    await sleep(200);
   }
 
   console.log('\n✅ Migração concluída!');
