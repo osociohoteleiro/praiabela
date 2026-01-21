@@ -6,12 +6,12 @@ import { StarIcon, CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon } from '@h
 const PackageCard = ({ pkg, index }) => (
   <div
     className={`card card-hover overflow-hidden relative animate-slide-up h-full ${
-      pkg.is_featured ? 'ring-4 ring-accent-400' : ''
+      pkg.is_featured === 1 ? 'ring-4 ring-accent-400' : ''
     }`}
     style={{ animationDelay: `${index * 0.1}s` }}
   >
     {/* Featured Badge */}
-    {pkg.is_featured && (
+    {pkg.is_featured === 1 && (
       <div className="absolute top-4 right-4 z-10">
         <div className="bg-accent-400 text-white px-4 py-2 rounded-full flex items-center gap-1 shadow-lg">
           <StarIcon className="w-5 h-5" />
@@ -75,7 +75,7 @@ const PackageCard = ({ pkg, index }) => (
             }, 500)
           }
         }}
-        className={`${pkg.is_featured ? 'btn-accent' : 'btn-primary'} w-full text-center block text-sm py-2.5`}
+        className={`${pkg.is_featured === 1 ? 'btn-accent' : 'btn-primary'} w-full text-center block text-sm py-2.5`}
       >
         Consultar disponibilidade
       </button>
@@ -89,13 +89,31 @@ const Packages = () => {
   const [currentMobileIndex, setCurrentMobileIndex] = useState(0)
   const [touchStart, setTouchStart] = useState(null)
   const [touchEnd, setTouchEnd] = useState(null)
+  const [showDesktopArrows, setShowDesktopArrows] = useState(false)
   const scrollContainerRef = useRef(null)
 
   const minSwipeDistance = 50
+  const cardWidth = 340
+  const cardGap = 24
 
   useEffect(() => {
     loadPackages()
   }, [])
+
+  // Check if desktop arrows should be shown
+  useEffect(() => {
+    const checkArrowsVisibility = () => {
+      if (scrollContainerRef.current && packages.length > 0) {
+        const containerWidth = scrollContainerRef.current.clientWidth - 96 // subtract padding (px-12 = 48px each side)
+        const totalCardsWidth = packages.length * cardWidth + (packages.length - 1) * cardGap
+        setShowDesktopArrows(totalCardsWidth > containerWidth)
+      }
+    }
+
+    checkArrowsVisibility()
+    window.addEventListener('resize', checkArrowsVisibility)
+    return () => window.removeEventListener('resize', checkArrowsVisibility)
+  }, [packages])
 
   const loadPackages = async () => {
     try {
@@ -237,22 +255,26 @@ const Packages = () => {
 
             {/* Desktop Slider - Múltiplos cards */}
             <div className="hidden md:block relative">
-              {/* Navigation Buttons */}
-              <button
-                onClick={() => scroll('left')}
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-[2] bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-300 hover:scale-110"
-                aria-label="Anterior"
-              >
-                <ChevronLeftIcon className="w-6 h-6 text-primary-500" />
-              </button>
+              {/* Navigation Buttons - Only show when needed */}
+              {showDesktopArrows && (
+                <>
+                  <button
+                    onClick={() => scroll('left')}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-[2] bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-300 hover:scale-110"
+                    aria-label="Anterior"
+                  >
+                    <ChevronLeftIcon className="w-6 h-6 text-primary-500" />
+                  </button>
 
-              <button
-                onClick={() => scroll('right')}
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-[2] bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-300 hover:scale-110"
-                aria-label="Próximo"
-              >
-                <ChevronRightIcon className="w-6 h-6 text-primary-500" />
-              </button>
+                  <button
+                    onClick={() => scroll('right')}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-[2] bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-300 hover:scale-110"
+                    aria-label="Próximo"
+                  >
+                    <ChevronRightIcon className="w-6 h-6 text-primary-500" />
+                  </button>
+                </>
+              )}
 
               {/* Scrollable Container */}
               <div

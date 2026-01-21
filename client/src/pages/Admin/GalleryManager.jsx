@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from 'react'
-import AdminLayout from '../../components/AdminLayout'
 import { galleryAPI, mediaAPI } from '../../services/api'
 import {
   TrashIcon,
@@ -234,8 +233,7 @@ const GalleryManager = () => {
   }
 
   return (
-    <AdminLayout>
-      <div className="animate-fade-in">
+    <div className="animate-fade-in">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
@@ -351,7 +349,6 @@ const GalleryManager = () => {
             ))}
           </div>
         )}
-      </div>
 
       {/* Add Image Modal */}
       {showAddModal && (
@@ -631,7 +628,7 @@ const GalleryManager = () => {
           </div>
         </div>
       )}
-    </AdminLayout>
+    </div>
   )
 }
 

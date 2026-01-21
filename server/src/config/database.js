@@ -126,6 +126,19 @@ export const initDatabase = () => {
       )
     `);
 
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS experiences (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        image_url TEXT NOT NULL,
+        display_order INTEGER DEFAULT 0,
+        is_active INTEGER DEFAULT 1,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     console.log('✅ Tabelas criadas');
 
     // Create default admin user if not exists
@@ -194,6 +207,49 @@ export const initDatabase = () => {
       ).run('Pacote Relax', 'Descanse e renove suas energias', 1800.00, '["3 diárias", "Café da manhã", "Spa completo", "Yoga na praia", "Jantar especial"]', 0, 1);
 
       console.log('✅ Pacotes de exemplo criados');
+    }
+
+    // Create sample experiences
+    const experienceCount = db.prepare('SELECT COUNT(*) as count FROM experiences').get();
+    if (experienceCount.count === 0) {
+      const experiences = [
+        {
+          title: 'Boas-vindas!',
+          description: 'Na chegada, você será recepcionado com um suco de cacau geladinho e um chocolate orgânico 60% cacau para começar bem a sua estadia.',
+          image_url: 'https://praiabela.com.br/wp-content/uploads/2024/01/625e01b005b86510d8bcd756_Boas-vindas-p-500.webp',
+          display_order: 1
+        },
+        {
+          title: 'Nossa despedida',
+          description: 'No check-out você recebe um tsuru de despedida, que significa prosperidade e longevidade e alinha com a origem dos proprietários que são descendentes de japoneses. O tsuru é um origami de ave.',
+          image_url: 'https://praiabela.com.br/wp-content/uploads/2024/01/625ec5b82e2ad383153df250_Despedida-p-500.webp',
+          display_order: 2
+        },
+        {
+          title: 'Spa do Cacau',
+          description: 'Oferecemos vários tipos de massagens, realizados por profissionais especializados! A novidade agora é o SPA do Cacau, que conta com os benefícios desse poderoso fruto!',
+          image_url: 'https://praiabela.com.br/wp-content/uploads/2024/01/62913f35ead22d076a2a96c8_Spa-do-Cacau.webp',
+          display_order: 3
+        },
+        {
+          title: 'Pingo no Oceano',
+          description: 'Todo o recolhimento de óleo usado é transformado em sabão, que é colocado à disposição na pousada e ofertado quando você traz o seu lixo.',
+          image_url: 'https://praiabela.com.br/wp-content/uploads/2024/01/62913f4518fd241310568d02_Pingo-no-Oceano-p-500.webp',
+          display_order: 4
+        },
+        {
+          title: 'Vira Bolsa',
+          description: 'Parceria com Associação ACEAI convertendo roupas de cama danificadas em bolsas educacionais para costureiras locais, promovendo sustentabilidade.',
+          image_url: 'https://praiabela.com.br/wp-content/uploads/2024/01/62823dc02938fbe60cff66e8_Vira-Bolsa-p-500.webp',
+          display_order: 5
+        }
+      ];
+
+      const insertExp = db.prepare('INSERT INTO experiences (title, description, image_url, display_order) VALUES (?, ?, ?, ?)');
+      for (const exp of experiences) {
+        insertExp.run(exp.title, exp.description, exp.image_url, exp.display_order);
+      }
+      console.log('✅ Experiências de exemplo criadas');
     }
 
     console.log('✅ Database inicializado com sucesso!');

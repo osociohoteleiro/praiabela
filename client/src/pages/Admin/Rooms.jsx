@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import AdminLayout from '../../components/AdminLayout'
 import { roomsAPI, mediaAPI } from '../../services/api'
 import { PlusIcon, PencilIcon, TrashIcon, XMarkIcon, UserGroupIcon } from '@heroicons/react/24/outline'
 
@@ -165,8 +164,7 @@ const Rooms = () => {
   }
 
   return (
-    <AdminLayout>
-      <div className="animate-fade-in">
+    <div className="animate-fade-in">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
@@ -480,8 +478,7 @@ const Rooms = () => {
             </div>
           </div>
         )}
-      </div>
-    </AdminLayout>
+    </div>
   )
 }
 

@@ -5,6 +5,7 @@ import About from '../components/About'
 import Experiences from '../components/Experiences'
 import Rooms from '../components/Rooms'
 import Packages from '../components/Packages'
+import Promotions from '../components/Promotions'
 import Gallery from '../components/Gallery'
 import Contact from '../components/Contact'
 import Footer from '../components/Footer'
@@ -19,8 +20,9 @@ const Home = () => {
       </div>
       <About />
       <Experiences />
-      <Rooms />
       <Packages />
+      <Promotions />
+      <Rooms />
       <Gallery />
       <Contact />
       <Footer />

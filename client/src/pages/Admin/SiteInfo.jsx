@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import AdminLayout from '../../components/AdminLayout'
 import { siteInfoAPI } from '../../services/api'
 
 const SiteInfo = () => {
@@ -54,17 +53,14 @@ const SiteInfo = () => {
 
   if (loading) {
     return (
-      <AdminLayout>
-        <div className="text-center py-12">
-          <div className="spinner mx-auto"></div>
-        </div>
-      </AdminLayout>
+      <div className="text-center py-12">
+        <div className="spinner mx-auto"></div>
+      </div>
     )
   }
 
   return (
-    <AdminLayout>
-      <div className="animate-fade-in max-w-4xl">
+    <div className="animate-fade-in max-w-4xl">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-display font-bold text-gray-900 mb-2">
@@ -244,8 +240,7 @@ const SiteInfo = () => {
             </button>
           </div>
         </form>
-      </div>
-    </AdminLayout>
+    </div>
   )
 }
 

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
-import { CalendarIcon, UserGroupIcon, UserIcon } from '@heroicons/react/24/outline'
+import { CalendarIcon, UserGroupIcon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline'
 
 const BookingForm = () => {
   const [checkIn, setCheckIn] = useState(null)
@@ -12,6 +12,9 @@ const BookingForm = () => {
   const [isHighlighted, setIsHighlighted] = useState(false)
   const [error, setError] = useState(null)
   const [mobileStep, setMobileStep] = useState(1) // 1: datas, 2: hóspedes
+  const [showBookingModal, setShowBookingModal] = useState(false)
+  const [bookingUrl, setBookingUrl] = useState('')
+  const [isLoadingBooking, setIsLoadingBooking] = useState(false)
   const formRef = useRef(null)
   const placeholderRef = useRef(null)
   const checkInRef = useRef(null)
@@ -54,6 +57,31 @@ const BookingForm = () => {
 
     window.addEventListener('highlightBookingForm', handleHighlight)
     return () => window.removeEventListener('highlightBookingForm', handleHighlight)
+  }, [])
+
+  // Listener para abrir modal direto (sem parâmetros)
+  useEffect(() => {
+    const handleOpenBookingModal = () => {
+      const baseUrl = 'https://book.omnibees.com/hotelresults?q=4071&NRooms=1&lang=pt&currencyId=BRL'
+      setBookingUrl(baseUrl)
+      setIsLoadingBooking(true)
+      setShowBookingModal(true)
+      document.body.style.overflow = 'hidden'
+    }
+
+    const handleCloseBookingModal = () => {
+      setShowBookingModal(false)
+      setBookingUrl('')
+      setIsLoadingBooking(false)
+      document.body.style.overflow = ''
+    }
+
+    window.addEventListener('openBookingModal', handleOpenBookingModal)
+    window.addEventListener('closeBookingModal', handleCloseBookingModal)
+    return () => {
+      window.removeEventListener('openBookingModal', handleOpenBookingModal)
+      window.removeEventListener('closeBookingModal', handleCloseBookingModal)
+    }
   }, [])
 
   const formatDateForOmnibees = (date) => {
@@ -104,8 +132,26 @@ const BookingForm = () => {
 
     const omnibeesUrl = `https://book.omnibees.com/hotelresults?q=4071&NRooms=1&CheckIn=${checkInFormatted}&CheckOut=${checkOutFormatted}&ad=${adults}&ch=${children}&ag=&group_code=&Code=&loyalty_code=&lang=pt&currencyId=BRL`
 
-    window.open(omnibeesUrl, '_blank')
+    // Abrir modal com iframe ao invés de nova aba
+    setBookingUrl(omnibeesUrl)
+    setIsLoadingBooking(true)
+    setShowBookingModal(true)
+    document.body.style.overflow = 'hidden'
   }
+
+  const closeBookingModal = () => {
+    setShowBookingModal(false)
+    setBookingUrl('')
+    setIsLoadingBooking(false)
+    document.body.style.overflow = ''
+  }
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [])
 
   // Mobile Sticky Version
   const renderMobileSticky = () => (
@@ -477,6 +523,48 @@ const BookingForm = () => {
           </p>
         )}
       </div>
+
+      {/* Modal de Reservas - Tela Cheia */}
+      {showBookingModal && (
+        <div className="fixed inset-0 z-[100] bg-black/80 animate-fade-in">
+          {/* Header do Modal */}
+          <div className="absolute top-0 left-0 right-0 bg-white shadow-lg z-10 px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="font-display text-xl font-bold text-gradient-warm">
+                Pousada Praia Bela
+              </span>
+              <span className="hidden sm:inline text-gray-400">|</span>
+              <span className="hidden sm:inline text-gray-600 text-sm">Motor de Reservas</span>
+            </div>
+            <button
+              onClick={closeBookingModal}
+              className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors"
+            >
+              <XMarkIcon className="w-5 h-5" />
+              <span className="hidden sm:inline font-medium">Fechar</span>
+            </button>
+          </div>
+
+          {/* Loading Indicator */}
+          {isLoadingBooking && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white z-[5] mt-14">
+              <div className="text-center">
+                <div className="spinner mx-auto mb-4"></div>
+                <p className="text-gray-600">Carregando motor de reservas...</p>
+              </div>
+            </div>
+          )}
+
+          {/* Iframe do Motor de Reservas */}
+          <iframe
+            src={bookingUrl}
+            className="w-full h-full pt-14 border-0 bg-white"
+            title="Motor de Reservas - Pousada Praia Bela"
+            onLoad={() => setIsLoadingBooking(false)}
+            allow="payment"
+          />
+        </div>
+      )}
     </>
   )
 }

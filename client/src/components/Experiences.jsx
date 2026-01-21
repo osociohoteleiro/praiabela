@@ -1,38 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
-
-const experiences = [
-  {
-    id: 1,
-    title: 'Boas-vindas!',
-    description: 'Na chegada, você será recepcionado com um suco de cacau geladinho e um chocolate orgânico 60% cacau para começar bem a sua estadia.',
-    image: 'https://praiabela.com.br/wp-content/uploads/2024/01/625e01b005b86510d8bcd756_Boas-vindas-p-500.webp'
-  },
-  {
-    id: 2,
-    title: 'Nossa despedida',
-    description: 'No check-out você recebe um tsuru de despedida, que significa prosperidade e longevidade e alinha com a origem dos proprietários que são descendentes de japoneses. O tsuru é um origami de ave.',
-    image: 'https://praiabela.com.br/wp-content/uploads/2024/01/625ec5b82e2ad383153df250_Despedida-p-500.webp'
-  },
-  {
-    id: 3,
-    title: 'Spa do Cacau',
-    description: 'Oferecemos vários tipos de massagens, realizados por profissionais especializados! A novidade agora é o SPA do Cacau, que conta com os benefícios desse poderoso fruto!',
-    image: 'https://praiabela.com.br/wp-content/uploads/2024/01/62913f35ead22d076a2a96c8_Spa-do-Cacau.webp'
-  },
-  {
-    id: 4,
-    title: 'Pingo no Oceano',
-    description: 'Todo o recolhimento de óleo usado é transformado em sabão, que é colocado à disposição na pousada e ofertado quando você traz o seu lixo.',
-    image: 'https://praiabela.com.br/wp-content/uploads/2024/01/62913f4518fd241310568d02_Pingo-no-Oceano-p-500.webp'
-  },
-  {
-    id: 5,
-    title: 'Vira Bolsa',
-    description: 'Parceria com Associação ACEAI convertendo roupas de cama danificadas em bolsas educacionais para costureiras locais, promovendo sustentabilidade.',
-    image: 'https://praiabela.com.br/wp-content/uploads/2024/01/62823dc02938fbe60cff66e8_Vira-Bolsa-p-500.webp'
-  }
-]
+import { experiencesAPI } from '../services/api'
 
 // Card de experiência
 const ExperienceCard = ({ experience, index }) => (
@@ -42,7 +10,7 @@ const ExperienceCard = ({ experience, index }) => (
   >
     <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[4/5]">
       <img
-        src={experience.image}
+        src={experience.image_url}
         alt={experience.title}
         className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
         loading="lazy"
@@ -59,11 +27,28 @@ const ExperienceCard = ({ experience, index }) => (
 )
 
 const Experiences = () => {
+  const [experiences, setExperiences] = useState([])
+  const [loading, setLoading] = useState(true)
   const [currentMobileIndex, setCurrentMobileIndex] = useState(0)
   const [touchStart, setTouchStart] = useState(null)
   const [touchEnd, setTouchEnd] = useState(null)
 
   const minSwipeDistance = 50
+
+  useEffect(() => {
+    loadExperiences()
+  }, [])
+
+  const loadExperiences = async () => {
+    try {
+      const { data } = await experiencesAPI.getAll()
+      setExperiences(data)
+    } catch (error) {
+      console.error('Error loading experiences:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Mobile slider navigation
   const goToNextMobile = () => {
@@ -94,6 +79,20 @@ const Experiences = () => {
     if (isRightSwipe) {
       goToPrevMobile()
     }
+  }
+
+  if (loading) {
+    return (
+      <section className="section-padding bg-gradient-to-b from-white to-gray-50">
+        <div className="container-custom text-center">
+          <div className="spinner mx-auto"></div>
+        </div>
+      </section>
+    )
+  }
+
+  if (experiences.length === 0) {
+    return null
   }
 
   return (

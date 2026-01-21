@@ -5,6 +5,10 @@ import { AdminProvider } from './context/AdminContext'
 // Public Pages (eager loading for better UX)
 import Home from './pages/Home'
 
+// Admin Layout (eager loading to prevent flashing)
+import AdminLayout from './components/AdminLayout'
+import ProtectedRoute from './components/ProtectedRoute'
+
 // Admin Pages (lazy loading)
 const AdminLogin = lazy(() => import('./pages/Admin/Login'))
 const AdminDashboard = lazy(() => import('./pages/Admin/Dashboard'))
@@ -13,11 +17,9 @@ const AdminPackages = lazy(() => import('./pages/Admin/Packages'))
 const AdminRooms = lazy(() => import('./pages/Admin/Rooms'))
 const AdminSiteInfo = lazy(() => import('./pages/Admin/SiteInfo'))
 const AdminGallery = lazy(() => import('./pages/Admin/GalleryManager'))
+const AdminExperiences = lazy(() => import('./pages/Admin/ExperiencesManager'))
 
-// Protected Route Component
-import ProtectedRoute from './components/ProtectedRoute'
-
-// Loading component
+// Loading component for login page
 const LoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-100">
     <div className="text-center">
@@ -31,64 +33,38 @@ function App() {
   return (
     <AdminProvider>
       <Router>
-        <Suspense fallback={<LoadingFallback />}>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Home />} />
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Home />} />
 
-            {/* Admin Routes */}
-            <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route
-              path="/admin/dashboard"
-              element={
-                <ProtectedRoute>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/promotions"
-              element={
-                <ProtectedRoute>
-                  <AdminPromotions />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/packages"
-              element={
-                <ProtectedRoute>
-                  <AdminPackages />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/rooms"
-              element={
-                <ProtectedRoute>
-                  <AdminRooms />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/site-info"
-              element={
-                <ProtectedRoute>
-                  <AdminSiteInfo />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/gallery"
-              element={
-                <ProtectedRoute>
-                  <AdminGallery />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </Suspense>
+          {/* Admin Login (outside layout) */}
+          <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+          <Route
+            path="/admin/login"
+            element={
+              <Suspense fallback={<LoadingFallback />}>
+                <AdminLogin />
+              </Suspense>
+            }
+          />
+
+          {/* Admin Routes with persistent layout */}
+          <Route
+            element={
+              <ProtectedRoute>
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/promotions" element={<AdminPromotions />} />
+            <Route path="/admin/packages" element={<AdminPackages />} />
+            <Route path="/admin/rooms" element={<AdminRooms />} />
+            <Route path="/admin/experiences" element={<AdminExperiences />} />
+            <Route path="/admin/gallery" element={<AdminGallery />} />
+            <Route path="/admin/site-info" element={<AdminSiteInfo />} />
+          </Route>
+        </Routes>
       </Router>
     </AdminProvider>
   )

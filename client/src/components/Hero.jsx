@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react'
 const Hero = () => {
   const tourUrl = 'https://tourmkr.com/F1biwwjN1X/46253449p&346.86h&78.42t&autorotate=true'
   const [isInteracting, setIsInteracting] = useState(false)
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
   const timeoutRef = useRef(null)
 
   const scrollToBooking = () => {
@@ -39,6 +40,19 @@ const Hero = () => {
     }
   }, [])
 
+  // Listen for booking modal events
+  useEffect(() => {
+    const handleOpenBookingModal = () => setIsBookingModalOpen(true)
+    const handleCloseBookingModal = () => setIsBookingModalOpen(false)
+
+    window.addEventListener('openBookingModal', handleOpenBookingModal)
+    window.addEventListener('closeBookingModal', handleCloseBookingModal)
+    return () => {
+      window.removeEventListener('openBookingModal', handleOpenBookingModal)
+      window.removeEventListener('closeBookingModal', handleCloseBookingModal)
+    }
+  }, [])
+
   return (
     <div className="relative h-screen w-full overflow-hidden">
       {/* Tour Virtual 360° Background */}
@@ -48,6 +62,20 @@ const Hero = () => {
         allowFullScreen
         allow="accelerometer; gyroscope; vr; xr"
         title="Tour Virtual 360° - Pousada Praia Bela"
+      />
+
+      {/* Gradiente no topo para destacar o menu */}
+      <div
+        className={`absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black/50 to-transparent z-[5] pointer-events-none transition-opacity duration-300 ${
+          isInteracting ? 'opacity-0' : 'opacity-100'
+        }`}
+      />
+
+      {/* Gradiente no centro/baixo para destacar o conteúdo */}
+      <div
+        className={`absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent z-[5] pointer-events-none transition-opacity duration-300 ${
+          isInteracting ? 'opacity-0' : 'opacity-100'
+        }`}
       />
 
       {/* Content - clicável para iniciar interação */}
@@ -91,30 +119,24 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <div
-        className={`absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce z-[15] transition-opacity duration-300 ${
-          isInteracting ? 'opacity-0 pointer-events-none' : 'opacity-100'
+      {/* Botão Tour Virtual 360° - aparece quando NÃO está interagindo e modal fechado */}
+      <button
+        onClick={startInteraction}
+        className={`absolute bottom-28 left-1/2 transform -translate-x-1/2 z-[15] bg-white/90 hover:bg-white text-gray-800 font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 flex items-center gap-2 ${
+          isInteracting || isBookingModalOpen ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'
         }`}
       >
-        <svg
-          className="w-8 h-8 text-white"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
         </svg>
-      </div>
+        Tour Virtual 360°
+      </button>
 
-      {/* Botão Sair do Tour */}
+      {/* Botão Sair do Tour - aparece quando ESTÁ interagindo */}
       <button
         onClick={exitTour}
-        className={`absolute bottom-10 left-1/2 transform -translate-x-1/2 z-[70] bg-white/90 hover:bg-white text-gray-800 font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 flex items-center gap-2 ${
-          isInteracting ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+        className={`absolute bottom-28 left-1/2 transform -translate-x-1/2 z-[70] bg-white/90 hover:bg-white text-gray-800 font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 flex items-center gap-2 ${
+          isInteracting ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
         }`}
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

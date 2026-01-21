@@ -42,6 +42,7 @@ export const authAPI = {
 // Promotions endpoints
 export const promotionsAPI = {
   getAll: () => api.get('/promotions'),
+  getAllAdmin: () => api.get('/promotions/admin'),
   getById: (id) => api.get(`/promotions/${id}`),
   create: (data) => api.post('/promotions', data),
   update: (id, data) => api.put(`/promotions/${id}`, data),
@@ -51,6 +52,7 @@ export const promotionsAPI = {
 // Packages endpoints
 export const packagesAPI = {
   getAll: () => api.get('/packages'),
+  getAllAdmin: () => api.get('/packages/admin'),
   getById: (id) => api.get(`/packages/${id}`),
   create: (data) => api.post('/packages', data),
   update: (id, data) => api.put(`/packages/${id}`, data),
@@ -93,6 +95,17 @@ export const galleryAPI = {
   update: (id, data) => api.put(`/gallery/${id}`, data),
   delete: (id) => api.delete(`/gallery/${id}`),
   reorder: (items) => api.put('/gallery/reorder/batch', { items }),
+}
+
+// Experiences endpoints
+export const experiencesAPI = {
+  getAll: () => api.get('/experiences'),
+  getAllAdmin: () => api.get('/experiences/admin/all'),
+  getById: (id) => api.get(`/experiences/${id}`),
+  create: (data) => api.post('/experiences', data),
+  update: (id, data) => api.put(`/experiences/${id}`, data),
+  delete: (id) => api.delete(`/experiences/${id}`),
+  reorder: (items) => api.put('/experiences/reorder/batch', { items }),
 }
 
 export default api

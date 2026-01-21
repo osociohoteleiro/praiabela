@@ -15,6 +15,7 @@ import roomsRoutes from './routes/rooms.js'
 import siteInfoRoutes from './routes/siteInfo.js'
 import uploadRoutes from './routes/upload.js'
 import galleryRoutes from './routes/gallery.js'
+import experiencesRoutes from './routes/experiences.js'
 
 dotenv.config()
 
@@ -70,6 +71,7 @@ app.use('/api/rooms', roomsRoutes)
 app.use('/api/site-info', siteInfoRoutes)
 app.use('/api/upload', uploadRoutes)
 app.use('/api/gallery', galleryRoutes)
+app.use('/api/experiences', experiencesRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -4,7 +4,7 @@ import { authMiddleware } from '../middleware/auth.js'
 
 const router = express.Router()
 
-// Get all packages (public)
+// Get all packages (public - only active)
 router.get('/', (req, res) => {
   try {
     const packages = db.prepare('SELECT * FROM packages WHERE is_active = 1 ORDER BY is_featured DESC, created_at DESC').all()
@@ -19,6 +19,25 @@ router.get('/', (req, res) => {
     res.json(parsedPackages)
   } catch (error) {
     console.error('Get packages error:', error)
+    res.status(500).json({ message: 'Erro ao buscar pacotes' })
+  }
+})
+
+// Get all packages for admin (including inactive)
+router.get('/admin', authMiddleware, (req, res) => {
+  try {
+    const packages = db.prepare('SELECT * FROM packages ORDER BY is_featured DESC, created_at DESC').all()
+
+    // Parse JSON fields
+    const parsedPackages = packages.map(pkg => ({
+      ...pkg,
+      inclusions: JSON.parse(pkg.inclusions || '[]'),
+      image_urls: JSON.parse(pkg.image_urls || '[]'),
+    }))
+
+    res.json(parsedPackages)
+  } catch (error) {
+    console.error('Get packages admin error:', error)
     res.status(500).json({ message: 'Erro ao buscar pacotes' })
   }
 })

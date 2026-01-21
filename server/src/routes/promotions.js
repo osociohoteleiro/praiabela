@@ -4,13 +4,24 @@ import { authMiddleware } from '../middleware/auth.js'
 
 const router = express.Router()
 
-// Get all promotions (public)
+// Get all promotions (public - only active)
 router.get('/', (req, res) => {
   try {
     const promotions = db.prepare('SELECT * FROM promotions WHERE is_active = 1 ORDER BY created_at DESC').all()
     res.json(promotions)
   } catch (error) {
     console.error('Get promotions error:', error)
+    res.status(500).json({ message: 'Erro ao buscar promoções' })
+  }
+})
+
+// Get all promotions for admin (including inactive)
+router.get('/admin', authMiddleware, (req, res) => {
+  try {
+    const promotions = db.prepare('SELECT * FROM promotions ORDER BY created_at DESC').all()
+    res.json(promotions)
+  } catch (error) {
+    console.error('Get promotions admin error:', error)
     res.status(500).json({ message: 'Erro ao buscar promoções' })
   }
 })

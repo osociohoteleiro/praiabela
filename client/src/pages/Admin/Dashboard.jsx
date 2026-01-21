@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import AdminLayout from '../../components/AdminLayout'
 import { promotionsAPI, packagesAPI } from '../../services/api'
 import {
   TagIcon,
@@ -55,8 +54,7 @@ const Dashboard = () => {
   ]
 
   return (
-    <AdminLayout>
-      <div className="animate-fade-in">
+    <div className="animate-fade-in">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-display font-bold text-gray-900 mb-2">
@@ -140,8 +138,7 @@ const Dashboard = () => {
             Abrir Site Público
           </a>
         </div>
-      </div>
-    </AdminLayout>
+    </div>
   )
 }
 

@@ -1,5 +1,6 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom'
 import { useAdmin } from '../context/AdminContext'
+import { Suspense } from 'react'
 import {
   HomeIcon,
   TagIcon,
@@ -8,7 +9,14 @@ import {
   InformationCircleIcon,
   ArrowLeftOnRectangleIcon,
   RectangleStackIcon,
+  HeartIcon,
 } from '@heroicons/react/24/outline'
+
+const ContentLoader = () => (
+  <div className="flex items-center justify-center py-12">
+    <div className="spinner"></div>
+  </div>
+)
 
 const AdminLayout = ({ children }) => {
   const location = useLocation()
@@ -20,8 +28,9 @@ const AdminLayout = ({ children }) => {
     { name: 'Promoções', path: '/admin/promotions', icon: TagIcon },
     { name: 'Pacotes', path: '/admin/packages', icon: CubeIcon },
     { name: 'Quartos', path: '/admin/rooms', icon: HomeModernIcon },
-    { name: 'Info do Site', path: '/admin/site-info', icon: InformationCircleIcon },
+    { name: 'Experiências', path: '/admin/experiences', icon: HeartIcon },
     { name: 'Galeria', path: '/admin/gallery', icon: RectangleStackIcon },
+    { name: 'Info do Site', path: '/admin/site-info', icon: InformationCircleIcon },
   ]
 
   const handleLogout = () => {
@@ -86,7 +95,11 @@ const AdminLayout = ({ children }) => {
       {/* Main Content */}
       <main className="ml-64">
         <div className="p-8">
-          {children}
+          {children || (
+            <Suspense fallback={<ContentLoader />}>
+              <Outlet />
+            </Suspense>
+          )}
         </div>
       </main>
     </div>
