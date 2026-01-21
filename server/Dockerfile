@@ -1,18 +1,4 @@
-# Build stage
-FROM node:20-alpine AS builder
-
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies (including dev dependencies for build)
-RUN npm ci
-
-# Copy source code
-COPY . .
-
-# Production stage
+# Single stage build for simplicity
 FROM node:20-alpine
 
 WORKDIR /app
@@ -21,13 +7,13 @@ WORKDIR /app
 RUN apk add --no-cache python3 make g++
 
 # Copy package files
-COPY package*.json ./
+COPY package.json ./
 
-# Install production dependencies only
-RUN npm ci --only=production
+# Install dependencies
+RUN npm install --omit=dev
 
 # Copy source code
-COPY --from=builder /app/src ./src
+COPY src ./src
 
 # Create database directory
 RUN mkdir -p /app/database
