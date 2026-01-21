@@ -5,15 +5,41 @@ import { roomsAPI } from '../services/api'
 // Componente de Slider de Imagens para cada quarto
 const ImageSlider = ({ images, roomName }) => {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [touchStart, setTouchStart] = useState(null)
+  const [touchEnd, setTouchEnd] = useState(null)
+
+  const minSwipeDistance = 50
 
   const goToNext = (e) => {
-    e.stopPropagation()
+    if (e) e.stopPropagation()
     setCurrentIndex((prev) => (prev + 1) % images.length)
   }
 
   const goToPrev = (e) => {
-    e.stopPropagation()
+    if (e) e.stopPropagation()
     setCurrentIndex((prev) => (prev - 1 + images.length) % images.length)
+  }
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > minSwipeDistance
+    const isRightSwipe = distance < -minSwipeDistance
+    if (isLeftSwipe && images.length > 1) {
+      goToNext()
+    }
+    if (isRightSwipe && images.length > 1) {
+      goToPrev()
+    }
   }
 
   if (!images || images.length === 0) {
@@ -27,28 +53,34 @@ const ImageSlider = ({ images, roomName }) => {
   }
 
   return (
-    <div className="relative w-full h-full group/slider">
+    <div
+      className="relative w-full h-full group/slider"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
       {/* Imagem atual */}
       <img
         src={images[currentIndex]}
         alt={`${roomName} - Foto ${currentIndex + 1}`}
         className="w-full h-full object-cover transition-opacity duration-300"
         loading="lazy"
+        draggable={false}
       />
 
-      {/* Botões de navegação - só aparecem se houver mais de 1 imagem */}
+      {/* Botões de navegação - visíveis no mobile, hover no desktop */}
       {images.length > 1 && (
         <>
           <button
             onClick={goToPrev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 opacity-0 group-hover/slider:opacity-100 transition-opacity duration-200 z-10"
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 opacity-70 md:opacity-0 md:group-hover/slider:opacity-100 transition-opacity duration-200 z-10"
             aria-label="Foto anterior"
           >
             <ChevronLeftIcon className="w-4 h-4" />
           </button>
           <button
             onClick={goToNext}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 opacity-0 group-hover/slider:opacity-100 transition-opacity duration-200 z-10"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 opacity-70 md:opacity-0 md:group-hover/slider:opacity-100 transition-opacity duration-200 z-10"
             aria-label="Próxima foto"
           >
             <ChevronRightIcon className="w-4 h-4" />
