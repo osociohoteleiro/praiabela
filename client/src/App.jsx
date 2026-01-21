@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AdminProvider } from './context/AdminContext'
 
 // Public Pages (eager loading for better UX)
@@ -37,6 +37,7 @@ function App() {
             <Route path="/" element={<Home />} />
 
             {/* Admin Routes */}
+            <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route
               path="/admin/dashboard"
