@@ -2,7 +2,7 @@ import express from 'express'
 import { uploadImage, uploadVideo, uploadMultipleImages } from '../middleware/upload.js'
 import { authMiddleware } from '../middleware/auth.js'
 import { uploadToS3, deleteFromS3 } from '../config/s3.js'
-import db from '../config/database.js'
+import { pool } from '../config/database.js'
 
 const router = express.Router()
 
@@ -21,10 +21,10 @@ router.post('/image', authMiddleware, (req, res) => {
       const result = await uploadToS3(req.file, 'images')
 
       // Save to database
-      db.prepare(`
+      await pool.query(`
         INSERT INTO media (type, category, url, s3_key, filename, size)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `).run('image', req.body.category || 'general', result.url, result.key, result.filename, req.file.size)
+        VALUES ($1, $2, $3, $4, $5, $6)
+      `, ['image', req.body.category || 'general', result.url, result.key, result.filename, req.file.size])
 
       res.json({
         message: 'Upload realizado com sucesso',
@@ -52,10 +52,10 @@ router.post('/video', authMiddleware, (req, res) => {
       const result = await uploadToS3(req.file, 'videos')
 
       // Save to database
-      db.prepare(`
+      await pool.query(`
         INSERT INTO media (type, category, url, s3_key, filename, size)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `).run('video', req.body.category || 'hero', result.url, result.key, result.filename, req.file.size)
+        VALUES ($1, $2, $3, $4, $5, $6)
+      `, ['video', req.body.category || 'hero', result.url, result.key, result.filename, req.file.size])
 
       res.json({
         message: 'Upload realizado com sucesso',
@@ -84,13 +84,11 @@ router.post('/images', authMiddleware, (req, res) => {
       const results = await Promise.all(uploadPromises)
 
       // Save to database
-      const stmt = db.prepare(`
-        INSERT INTO media (type, category, url, s3_key, filename, size)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `)
-
       for (let i = 0; i < results.length; i++) {
-        stmt.run('image', req.body.category || 'gallery', results[i].url, results[i].key, results[i].filename, req.files[i].size)
+        await pool.query(`
+          INSERT INTO media (type, category, url, s3_key, filename, size)
+          VALUES ($1, $2, $3, $4, $5, $6)
+        `, ['image', req.body.category || 'gallery', results[i].url, results[i].key, results[i].filename, req.files[i].size])
       }
 
       res.json({
@@ -113,7 +111,7 @@ router.delete('/:key(*)', authMiddleware, async (req, res) => {
     await deleteFromS3(key)
 
     // Delete from database
-    db.prepare('DELETE FROM media WHERE s3_key = ?').run(key)
+    await pool.query('DELETE FROM media WHERE s3_key = $1', [key])
 
     res.json({ message: 'Arquivo deletado com sucesso' })
   } catch (error) {

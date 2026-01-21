@@ -1,12 +1,12 @@
 import express from 'express';
-import db from '../config/database.js';
+import { pool } from '../config/database.js';
 import { authMiddleware } from '../middleware/auth.js';
 
 const router = express.Router();
 
 // Endpoint para importar dados do banco local para produção
 // Requer autenticação de admin
-router.post('/import', authMiddleware, (req, res) => {
+router.post('/import', authMiddleware, async (req, res) => {
   try {
     const { data } = req.body;
 
@@ -23,18 +23,18 @@ router.post('/import', authMiddleware, (req, res) => {
       if (data[table] && Array.isArray(data[table])) {
         try {
           // Deletar dados existentes (exceto admins)
-          db.prepare(`DELETE FROM ${table}`).run();
+          await pool.query(`DELETE FROM ${table}`);
 
           if (data[table].length > 0) {
             const columns = Object.keys(data[table][0]);
-            const placeholders = columns.map(() => '?').join(', ');
-            const insertStmt = db.prepare(
-              `INSERT INTO ${table} (${columns.join(', ')}) VALUES (${placeholders})`
-            );
+            const placeholders = columns.map((_, i) => `$${i + 1}`).join(', ');
 
             for (const row of data[table]) {
               const values = columns.map(col => row[col]);
-              insertStmt.run(...values);
+              await pool.query(
+                `INSERT INTO ${table} (${columns.join(', ')}) VALUES (${placeholders})`,
+                values
+              );
             }
           }
 
@@ -56,13 +56,14 @@ router.post('/import', authMiddleware, (req, res) => {
 });
 
 // Endpoint para exportar dados (GET)
-router.get('/export', authMiddleware, (req, res) => {
+router.get('/export', authMiddleware, async (req, res) => {
   try {
     const tables = ['site_info', 'rooms', 'gallery', 'packages', 'promotions', 'experiences', 'media'];
     const data = {};
 
     for (const table of tables) {
-      data[table] = db.prepare(`SELECT * FROM ${table}`).all();
+      const result = await pool.query(`SELECT * FROM ${table}`);
+      data[table] = result.rows;
     }
 
     res.json({ data });

@@ -1,141 +1,155 @@
-import Database from 'better-sqlite3';
+import pg from 'pg';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import fs from 'fs';
 
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const { Pool } = pg;
 
-// Ensure database directory exists
-const dataDir = join(__dirname, '../../database');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
+// PostgreSQL connection
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+});
+
+console.log('✅ Conectado ao PostgreSQL');
+
+// Helper para queries
+const db = {
+  query: (text, params) => pool.query(text, params),
+
+  // Compatibilidade com sintaxe anterior
+  prepare: (text) => ({
+    run: async (...params) => {
+      await pool.query(text.replace(/\?/g, (_, i) => `$${params.indexOf(_) + 1}`), params);
+    },
+    get: async (...params) => {
+      const result = await pool.query(convertPlaceholders(text), params);
+      return result.rows[0];
+    },
+    all: async (...params) => {
+      const result = await pool.query(convertPlaceholders(text), params);
+      return result.rows;
+    }
+  })
+};
+
+// Converte ? para $1, $2, etc
+function convertPlaceholders(sql) {
+  let i = 0;
+  return sql.replace(/\?/g, () => `$${++i}`);
 }
 
-// Use existing SQLite database
-const dbPath = join(dataDir, 'praiabela.db');
-const db = new Database(dbPath);
-
-// Enable foreign keys and WAL mode for better performance
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
-
-console.log('✅ Conectado ao SQLite:', dbPath);
-
-export const initDatabase = () => {
+export const initDatabase = async () => {
   try {
     // Create tables
-    db.exec(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS admins (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        name TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        name VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
-    db.exec(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS promotions (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
         description TEXT NOT NULL,
         discount INTEGER NOT NULL,
-        valid_until TEXT,
+        valid_until VARCHAR(50),
         image_url TEXT,
         is_active INTEGER DEFAULT 1,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
-    db.exec(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS packages (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
         description TEXT NOT NULL,
-        price REAL NOT NULL,
+        price DECIMAL(10,2) NOT NULL,
         inclusions TEXT NOT NULL,
         image_urls TEXT,
         is_featured INTEGER DEFAULT 0,
         is_active INTEGER DEFAULT 1,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
-    db.exec(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS site_info (
-        id INTEGER PRIMARY KEY CHECK (id = 1),
+        id INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
         about_text TEXT,
-        contact_email TEXT,
-        contact_phone TEXT,
+        contact_email VARCHAR(255),
+        contact_phone VARCHAR(50),
         contact_address TEXT,
-        check_in_time TEXT DEFAULT '14:00',
-        check_out_time TEXT DEFAULT '12:00',
+        check_in_time VARCHAR(10) DEFAULT '14:00',
+        check_out_time VARCHAR(10) DEFAULT '12:00',
         facebook_url TEXT,
         instagram_url TEXT,
-        whatsapp_number TEXT,
+        whatsapp_number VARCHAR(50),
         hero_video_url TEXT,
         logo_url TEXT,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
-    db.exec(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS media (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        type TEXT NOT NULL CHECK(type IN ('image', 'video')),
-        category TEXT,
+        id SERIAL PRIMARY KEY,
+        type VARCHAR(20) NOT NULL CHECK(type IN ('image', 'video')),
+        category VARCHAR(50),
         url TEXT NOT NULL,
         s3_key TEXT NOT NULL,
-        filename TEXT NOT NULL,
+        filename VARCHAR(255) NOT NULL,
         size INTEGER,
-        uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
-    db.exec(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS rooms (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
         description TEXT NOT NULL,
         capacity INTEGER NOT NULL DEFAULT 2,
-        size TEXT,
-        price REAL NOT NULL DEFAULT 0,
+        size VARCHAR(50),
+        price DECIMAL(10,2) NOT NULL DEFAULT 0,
         amenities TEXT,
         image_urls TEXT,
         is_active INTEGER DEFAULT 1,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
-    db.exec(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS gallery (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         url TEXT NOT NULL,
-        caption TEXT,
+        caption VARCHAR(255),
         display_order INTEGER DEFAULT 0,
         is_active INTEGER DEFAULT 1,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
-    db.exec(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS experiences (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
         description TEXT NOT NULL,
         image_url TEXT NOT NULL,
         display_order INTEGER DEFAULT 0,
         is_active INTEGER DEFAULT 1,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
@@ -143,28 +157,27 @@ export const initDatabase = () => {
 
     // Create default admin user if not exists
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@praiabela.com';
-    const existingAdmin = db.prepare('SELECT id FROM admins WHERE email = ?').get(adminEmail);
+    const existingAdmin = await pool.query('SELECT id FROM admins WHERE email = $1', [adminEmail]);
 
-    if (!existingAdmin) {
+    if (existingAdmin.rows.length === 0) {
       const hashedPassword = bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'admin123', 10);
-      db.prepare('INSERT INTO admins (email, password, name) VALUES (?, ?, ?)').run(
-        adminEmail,
-        hashedPassword,
-        'Administrador'
+      await pool.query(
+        'INSERT INTO admins (email, password, name) VALUES ($1, $2, $3)',
+        [adminEmail, hashedPassword, 'Administrador']
       );
       console.log('✅ Admin padrão criado');
     }
 
     // Create default site_info if not exists
-    const existingSiteInfo = db.prepare('SELECT id FROM site_info WHERE id = 1').get();
+    const existingSiteInfo = await pool.query('SELECT id FROM site_info WHERE id = 1');
 
-    if (!existingSiteInfo) {
-      db.prepare(`
+    if (existingSiteInfo.rows.length === 0) {
+      await pool.query(`
         INSERT INTO site_info (
           id, about_text, contact_email, contact_phone, contact_address,
           check_in_time, check_out_time, whatsapp_number
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `).run(
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `, [
         1,
         'A Pousada Praia Bela é o lugar perfeito para suas férias em Ilhéus, Bahia. Localizada à beira-mar, oferecemos conforto, tranquilidade e uma vista paradisíaca do oceano.',
         'contato@praiabela.com',
@@ -173,83 +186,8 @@ export const initDatabase = () => {
         '14:00',
         '12:00',
         '5573987654321'
-      );
+      ]);
       console.log('✅ Informações do site criadas');
-    }
-
-    // Create some sample promotions
-    const promoCount = db.prepare('SELECT COUNT(*) as count FROM promotions').get();
-    if (promoCount.count === 0) {
-      db.prepare(
-        'INSERT INTO promotions (title, description, discount, valid_until, is_active) VALUES (?, ?, ?, ?, ?)'
-      ).run('Promoção de Verão', 'Aproveite nossos preços especiais para o verão! Reserve agora e ganhe até 30% de desconto.', 30, '2025-03-31', 1);
-
-      db.prepare(
-        'INSERT INTO promotions (title, description, discount, valid_until, is_active) VALUES (?, ?, ?, ?, ?)'
-      ).run('Fim de Semana Romântico', 'Pacote especial para casais! Inclui jantar à luz de velas na praia.', 20, '2025-12-31', 1);
-
-      console.log('✅ Promoções de exemplo criadas');
-    }
-
-    // Create sample packages
-    const packageCount = db.prepare('SELECT COUNT(*) as count FROM packages').get();
-    if (packageCount.count === 0) {
-      db.prepare(
-        'INSERT INTO packages (name, description, price, inclusions, is_featured, is_active) VALUES (?, ?, ?, ?, ?, ?)'
-      ).run('Pacote Lua de Mel', 'Experiência romântica completa para recém-casados', 2500.00, '["5 diárias", "Café da manhã", "Jantar romântico", "Decoração especial", "Massagem relaxante"]', 1, 1);
-
-      db.prepare(
-        'INSERT INTO packages (name, description, price, inclusions, is_featured, is_active) VALUES (?, ?, ?, ?, ?, ?)'
-      ).run('Pacote Família', 'Diversão garantida para toda a família', 3200.00, '["7 diárias", "Café da manhã", "Atividades para crianças", "Passeio de barco", "Transfer incluído"]', 1, 1);
-
-      db.prepare(
-        'INSERT INTO packages (name, description, price, inclusions, is_featured, is_active) VALUES (?, ?, ?, ?, ?, ?)'
-      ).run('Pacote Relax', 'Descanse e renove suas energias', 1800.00, '["3 diárias", "Café da manhã", "Spa completo", "Yoga na praia", "Jantar especial"]', 0, 1);
-
-      console.log('✅ Pacotes de exemplo criados');
-    }
-
-    // Create sample experiences
-    const experienceCount = db.prepare('SELECT COUNT(*) as count FROM experiences').get();
-    if (experienceCount.count === 0) {
-      const experiences = [
-        {
-          title: 'Boas-vindas!',
-          description: 'Na chegada, você será recepcionado com um suco de cacau geladinho e um chocolate orgânico 60% cacau para começar bem a sua estadia.',
-          image_url: 'https://praiabela.com.br/wp-content/uploads/2024/01/625e01b005b86510d8bcd756_Boas-vindas-p-500.webp',
-          display_order: 1
-        },
-        {
-          title: 'Nossa despedida',
-          description: 'No check-out você recebe um tsuru de despedida, que significa prosperidade e longevidade e alinha com a origem dos proprietários que são descendentes de japoneses. O tsuru é um origami de ave.',
-          image_url: 'https://praiabela.com.br/wp-content/uploads/2024/01/625ec5b82e2ad383153df250_Despedida-p-500.webp',
-          display_order: 2
-        },
-        {
-          title: 'Spa do Cacau',
-          description: 'Oferecemos vários tipos de massagens, realizados por profissionais especializados! A novidade agora é o SPA do Cacau, que conta com os benefícios desse poderoso fruto!',
-          image_url: 'https://praiabela.com.br/wp-content/uploads/2024/01/62913f35ead22d076a2a96c8_Spa-do-Cacau.webp',
-          display_order: 3
-        },
-        {
-          title: 'Pingo no Oceano',
-          description: 'Todo o recolhimento de óleo usado é transformado em sabão, que é colocado à disposição na pousada e ofertado quando você traz o seu lixo.',
-          image_url: 'https://praiabela.com.br/wp-content/uploads/2024/01/62913f4518fd241310568d02_Pingo-no-Oceano-p-500.webp',
-          display_order: 4
-        },
-        {
-          title: 'Vira Bolsa',
-          description: 'Parceria com Associação ACEAI convertendo roupas de cama danificadas em bolsas educacionais para costureiras locais, promovendo sustentabilidade.',
-          image_url: 'https://praiabela.com.br/wp-content/uploads/2024/01/62823dc02938fbe60cff66e8_Vira-Bolsa-p-500.webp',
-          display_order: 5
-        }
-      ];
-
-      const insertExp = db.prepare('INSERT INTO experiences (title, description, image_url, display_order) VALUES (?, ?, ?, ?)');
-      for (const exp of experiences) {
-        insertExp.run(exp.title, exp.description, exp.image_url, exp.display_order);
-      }
-      console.log('✅ Experiências de exemplo criadas');
     }
 
     console.log('✅ Database inicializado com sucesso!');
@@ -259,4 +197,5 @@ export const initDatabase = () => {
   }
 };
 
+export { pool };
 export default db;

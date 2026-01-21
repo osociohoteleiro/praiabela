@@ -1,7 +1,7 @@
 import express from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import db from '../config/database.js'
+import { pool } from '../config/database.js'
 import { authMiddleware } from '../middleware/auth.js'
 
 const router = express.Router()
@@ -16,7 +16,8 @@ router.post('/login', async (req, res) => {
     }
 
     // Find admin
-    const admin = db.prepare('SELECT * FROM admins WHERE email = ?').get(email)
+    const result = await pool.query('SELECT * FROM admins WHERE email = $1', [email])
+    const admin = result.rows[0]
 
     if (!admin) {
       return res.status(401).json({ message: 'Credenciais inválidas' })
@@ -51,9 +52,10 @@ router.post('/login', async (req, res) => {
 })
 
 // Verify token
-router.get('/verify', authMiddleware, (req, res) => {
+router.get('/verify', authMiddleware, async (req, res) => {
   try {
-    const admin = db.prepare('SELECT id, email, name FROM admins WHERE id = ?').get(req.adminId)
+    const result = await pool.query('SELECT id, email, name FROM admins WHERE id = $1', [req.adminId])
+    const admin = result.rows[0]
 
     if (!admin) {
       return res.status(404).json({ message: 'Admin não encontrado' })

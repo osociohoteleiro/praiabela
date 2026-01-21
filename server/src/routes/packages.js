@@ -1,16 +1,16 @@
 import express from 'express'
-import db from '../config/database.js'
+import { pool } from '../config/database.js'
 import { authMiddleware } from '../middleware/auth.js'
 
 const router = express.Router()
 
 // Get all packages (public - only active)
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const packages = db.prepare('SELECT * FROM packages WHERE is_active = 1 ORDER BY is_featured DESC, created_at DESC').all()
+    const result = await pool.query('SELECT * FROM packages WHERE is_active = 1 ORDER BY is_featured DESC, created_at DESC')
 
     // Parse JSON fields
-    const parsedPackages = packages.map(pkg => ({
+    const parsedPackages = result.rows.map(pkg => ({
       ...pkg,
       inclusions: JSON.parse(pkg.inclusions || '[]'),
       image_urls: JSON.parse(pkg.image_urls || '[]'),
@@ -24,12 +24,12 @@ router.get('/', (req, res) => {
 })
 
 // Get all packages for admin (including inactive)
-router.get('/admin', authMiddleware, (req, res) => {
+router.get('/admin', authMiddleware, async (req, res) => {
   try {
-    const packages = db.prepare('SELECT * FROM packages ORDER BY is_featured DESC, created_at DESC').all()
+    const result = await pool.query('SELECT * FROM packages ORDER BY is_featured DESC, created_at DESC')
 
     // Parse JSON fields
-    const parsedPackages = packages.map(pkg => ({
+    const parsedPackages = result.rows.map(pkg => ({
       ...pkg,
       inclusions: JSON.parse(pkg.inclusions || '[]'),
       image_urls: JSON.parse(pkg.image_urls || '[]'),
@@ -43,9 +43,10 @@ router.get('/admin', authMiddleware, (req, res) => {
 })
 
 // Get single package (public)
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const pkg = db.prepare('SELECT * FROM packages WHERE id = ?').get(req.params.id)
+    const result = await pool.query('SELECT * FROM packages WHERE id = $1', [req.params.id])
+    const pkg = result.rows[0]
 
     if (!pkg) {
       return res.status(404).json({ message: 'Pacote não encontrado' })
@@ -65,7 +66,7 @@ router.get('/:id', (req, res) => {
 })
 
 // Create package (admin only)
-router.post('/', authMiddleware, (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   try {
     const { name, description, price, inclusions, image_urls, is_featured, is_active } = req.body
 
@@ -73,10 +74,11 @@ router.post('/', authMiddleware, (req, res) => {
       return res.status(400).json({ message: 'Campos obrigatórios faltando' })
     }
 
-    const result = db.prepare(`
+    const result = await pool.query(`
       INSERT INTO packages (name, description, price, inclusions, image_urls, is_featured, is_active)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING *
+    `, [
       name,
       description,
       price,
@@ -84,10 +86,9 @@ router.post('/', authMiddleware, (req, res) => {
       JSON.stringify(image_urls || []),
       is_featured || 0,
       is_active !== undefined ? is_active : 1
-    )
+    ])
 
-    const newPackage = db.prepare('SELECT * FROM packages WHERE id = ?').get(result.lastInsertRowid)
-
+    const newPackage = result.rows[0]
     const parsed = {
       ...newPackage,
       inclusions: JSON.parse(newPackage.inclusions),
@@ -102,21 +103,22 @@ router.post('/', authMiddleware, (req, res) => {
 })
 
 // Update package (admin only)
-router.put('/:id', authMiddleware, (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
   try {
     const { name, description, price, inclusions, image_urls, is_featured, is_active } = req.body
 
-    const exists = db.prepare('SELECT id FROM packages WHERE id = ?').get(req.params.id)
+    const exists = await pool.query('SELECT id FROM packages WHERE id = $1', [req.params.id])
 
-    if (!exists) {
+    if (exists.rows.length === 0) {
       return res.status(404).json({ message: 'Pacote não encontrado' })
     }
 
-    db.prepare(`
+    const result = await pool.query(`
       UPDATE packages
-      SET name = ?, description = ?, price = ?, inclusions = ?, image_urls = ?, is_featured = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP
-      WHERE id = ?
-    `).run(
+      SET name = $1, description = $2, price = $3, inclusions = $4, image_urls = $5, is_featured = $6, is_active = $7, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $8
+      RETURNING *
+    `, [
       name,
       description,
       price,
@@ -125,10 +127,9 @@ router.put('/:id', authMiddleware, (req, res) => {
       is_featured || 0,
       is_active !== undefined ? is_active : 1,
       req.params.id
-    )
+    ])
 
-    const updated = db.prepare('SELECT * FROM packages WHERE id = ?').get(req.params.id)
-
+    const updated = result.rows[0]
     const parsed = {
       ...updated,
       inclusions: JSON.parse(updated.inclusions),
@@ -143,15 +144,15 @@ router.put('/:id', authMiddleware, (req, res) => {
 })
 
 // Delete package (admin only)
-router.delete('/:id', authMiddleware, (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
   try {
-    const exists = db.prepare('SELECT id FROM packages WHERE id = ?').get(req.params.id)
+    const exists = await pool.query('SELECT id FROM packages WHERE id = $1', [req.params.id])
 
-    if (!exists) {
+    if (exists.rows.length === 0) {
       return res.status(404).json({ message: 'Pacote não encontrado' })
     }
 
-    db.prepare('DELETE FROM packages WHERE id = ?').run(req.params.id)
+    await pool.query('DELETE FROM packages WHERE id = $1', [req.params.id])
 
     res.json({ message: 'Pacote deletado com sucesso' })
   } catch (error) {

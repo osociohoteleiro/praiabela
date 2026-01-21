@@ -1,14 +1,14 @@
 import express from 'express'
-import db from '../config/database.js'
+import { pool } from '../config/database.js'
 import { authMiddleware } from '../middleware/auth.js'
 
 const router = express.Router()
 
 // Get all gallery images (public - only active)
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const images = db.prepare('SELECT * FROM gallery WHERE is_active = 1 ORDER BY display_order ASC, created_at DESC').all()
-    res.json(images)
+    const result = await pool.query('SELECT * FROM gallery WHERE is_active = 1 ORDER BY display_order ASC, created_at DESC')
+    res.json(result.rows)
   } catch (error) {
     console.error('Get gallery error:', error)
     res.status(500).json({ message: 'Erro ao buscar galeria' })
@@ -16,10 +16,10 @@ router.get('/', (req, res) => {
 })
 
 // Get all gallery images (admin - including inactive)
-router.get('/admin/all', authMiddleware, (req, res) => {
+router.get('/admin/all', authMiddleware, async (req, res) => {
   try {
-    const images = db.prepare('SELECT * FROM gallery ORDER BY display_order ASC, created_at DESC').all()
-    res.json(images)
+    const result = await pool.query('SELECT * FROM gallery ORDER BY display_order ASC, created_at DESC')
+    res.json(result.rows)
   } catch (error) {
     console.error('Get all gallery error:', error)
     res.status(500).json({ message: 'Erro ao buscar galeria' })
@@ -27,7 +27,7 @@ router.get('/admin/all', authMiddleware, (req, res) => {
 })
 
 // Add image to gallery (admin only)
-router.post('/', authMiddleware, (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   try {
     const { url, caption, display_order, is_active } = req.body
 
@@ -35,18 +35,18 @@ router.post('/', authMiddleware, (req, res) => {
       return res.status(400).json({ message: 'URL da imagem é obrigatória' })
     }
 
-    const result = db.prepare(`
+    const result = await pool.query(`
       INSERT INTO gallery (url, caption, display_order, is_active)
-      VALUES (?, ?, ?, ?)
-    `).run(
+      VALUES ($1, $2, $3, $4)
+      RETURNING *
+    `, [
       url,
       caption || '',
       display_order || 0,
       is_active !== undefined ? is_active : 1
-    )
+    ])
 
-    const newImage = db.prepare('SELECT * FROM gallery WHERE id = ?').get(result.lastInsertRowid)
-    res.status(201).json(newImage)
+    res.status(201).json(result.rows[0])
   } catch (error) {
     console.error('Create gallery image error:', error)
     res.status(500).json({ message: 'Erro ao adicionar imagem' })
@@ -54,29 +54,29 @@ router.post('/', authMiddleware, (req, res) => {
 })
 
 // Update gallery image (admin only)
-router.put('/:id', authMiddleware, (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
   try {
     const { url, caption, display_order, is_active } = req.body
 
-    const exists = db.prepare('SELECT id FROM gallery WHERE id = ?').get(req.params.id)
-    if (!exists) {
+    const exists = await pool.query('SELECT id FROM gallery WHERE id = $1', [req.params.id])
+    if (exists.rows.length === 0) {
       return res.status(404).json({ message: 'Imagem não encontrada' })
     }
 
-    db.prepare(`
+    const result = await pool.query(`
       UPDATE gallery
-      SET url = ?, caption = ?, display_order = ?, is_active = ?
-      WHERE id = ?
-    `).run(
+      SET url = $1, caption = $2, display_order = $3, is_active = $4
+      WHERE id = $5
+      RETURNING *
+    `, [
       url,
       caption || '',
       display_order || 0,
       is_active !== undefined ? is_active : 1,
       req.params.id
-    )
+    ])
 
-    const updated = db.prepare('SELECT * FROM gallery WHERE id = ?').get(req.params.id)
-    res.json(updated)
+    res.json(result.rows[0])
   } catch (error) {
     console.error('Update gallery image error:', error)
     res.status(500).json({ message: 'Erro ao atualizar imagem' })
@@ -84,14 +84,14 @@ router.put('/:id', authMiddleware, (req, res) => {
 })
 
 // Delete gallery image (admin only)
-router.delete('/:id', authMiddleware, (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
   try {
-    const exists = db.prepare('SELECT id FROM gallery WHERE id = ?').get(req.params.id)
-    if (!exists) {
+    const exists = await pool.query('SELECT id FROM gallery WHERE id = $1', [req.params.id])
+    if (exists.rows.length === 0) {
       return res.status(404).json({ message: 'Imagem não encontrada' })
     }
 
-    db.prepare('DELETE FROM gallery WHERE id = ?').run(req.params.id)
+    await pool.query('DELETE FROM gallery WHERE id = $1', [req.params.id])
     res.json({ message: 'Imagem removida com sucesso' })
   } catch (error) {
     console.error('Delete gallery image error:', error)
@@ -100,7 +100,7 @@ router.delete('/:id', authMiddleware, (req, res) => {
 })
 
 // Reorder gallery images (admin only)
-router.put('/reorder/batch', authMiddleware, (req, res) => {
+router.put('/reorder/batch', authMiddleware, async (req, res) => {
   try {
     const { items } = req.body
 
@@ -108,9 +108,9 @@ router.put('/reorder/batch', authMiddleware, (req, res) => {
       return res.status(400).json({ message: 'Items deve ser um array' })
     }
 
-    items.forEach((item, index) => {
-      db.prepare('UPDATE gallery SET display_order = ? WHERE id = ?').run(index, item.id)
-    })
+    for (let i = 0; i < items.length; i++) {
+      await pool.query('UPDATE gallery SET display_order = $1 WHERE id = $2', [i, items[i].id])
+    }
 
     res.json({ message: 'Ordem atualizada com sucesso' })
   } catch (error) {
