@@ -1,12 +1,12 @@
 import express from 'express';
 import db from '../config/database.js';
-import { authenticateToken } from './auth.js';
+import { authMiddleware } from '../middleware/auth.js';
 
 const router = express.Router();
 
 // Endpoint para importar dados do banco local para produção
 // Requer autenticação de admin
-router.post('/import', authenticateToken, (req, res) => {
+router.post('/import', authMiddleware, (req, res) => {
   try {
     const { data } = req.body;
 
@@ -56,7 +56,7 @@ router.post('/import', authenticateToken, (req, res) => {
 });
 
 // Endpoint para exportar dados (GET)
-router.get('/export', authenticateToken, (req, res) => {
+router.get('/export', authMiddleware, (req, res) => {
   try {
     const tables = ['site_info', 'rooms', 'gallery', 'packages', 'promotions', 'experiences', 'media'];
     const data = {};
