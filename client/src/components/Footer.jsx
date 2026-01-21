@@ -102,7 +102,17 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
-          <p>© {new Date().getFullYear()} Pousada Praia Bela. Todos os direitos reservados.</p>
+          <p>
+            Desenvolvido por:{' '}
+            <a
+              href="https://osociohoteleiro.com.br"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary-400 hover:text-primary-300 transition-colors"
+            >
+              O Sócio Hoteleiro
+            </a>
+          </p>
         </div>
       </div>
     </footer>
