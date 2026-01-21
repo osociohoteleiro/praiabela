@@ -2,6 +2,7 @@ import Navbar from '../components/Navbar'
 import Hero from '../components/Hero'
 import BookingForm from '../components/BookingForm'
 import About from '../components/About'
+import Experiences from '../components/Experiences'
 import Rooms from '../components/Rooms'
 import Packages from '../components/Packages'
 import Gallery from '../components/Gallery'
@@ -17,6 +18,7 @@ const Home = () => {
         <BookingForm />
       </div>
       <About />
+      <Experiences />
       <Rooms />
       <Packages />
       <Gallery />
