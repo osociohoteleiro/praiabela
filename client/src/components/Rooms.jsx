@@ -110,10 +110,70 @@ const ImageSlider = ({ images, roomName }) => {
   )
 }
 
+// Card de quarto reutilizável
+const RoomCard = ({ room, index }) => (
+  <div
+    className="card card-hover overflow-hidden group animate-slide-up h-full"
+    style={{ animationDelay: `${index * 0.1}s` }}
+  >
+    {/* Image Slider */}
+    <div className="relative h-56 overflow-hidden">
+      <ImageSlider images={room.image_urls} roomName={room.name} />
+      <div className="absolute top-4 right-4 bg-primary-500 text-white px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg z-20">
+        {room.capacity} {room.capacity === 1 ? 'pessoa' : 'pessoas'}
+      </div>
+    </div>
+
+    {/* Content */}
+    <div className="p-5">
+      <h3 className="text-xl font-display font-bold text-gray-900 mb-2">
+        {room.name}
+      </h3>
+      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+        {room.description}
+      </p>
+
+      {/* Features */}
+      {room.amenities && room.amenities.length > 0 && (
+        <ul className="space-y-1.5 mb-5">
+          {room.amenities.slice(0, 5).map((feature, idx) => (
+            <li key={idx} className="flex items-center text-sm text-gray-700">
+              <svg className="w-4 h-4 text-primary-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              {feature}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <button
+        onClick={() => {
+          const bookingForm = document.getElementById('booking-form')
+          if (bookingForm) {
+            bookingForm.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            setTimeout(() => {
+              window.dispatchEvent(new CustomEvent('highlightBookingForm'))
+            }, 500)
+          }
+        }}
+        className="btn-primary w-full text-center block text-sm py-2.5"
+      >
+        Consultar disponibilidade
+      </button>
+    </div>
+  </div>
+)
+
 const Rooms = () => {
   const scrollContainerRef = useRef(null)
   const [rooms, setRooms] = useState([])
   const [loading, setLoading] = useState(true)
+  const [currentMobileIndex, setCurrentMobileIndex] = useState(0)
+  const [touchStart, setTouchStart] = useState(null)
+  const [touchEnd, setTouchEnd] = useState(null)
+
+  const minSwipeDistance = 50
 
   useEffect(() => {
     loadRooms()
@@ -132,14 +192,45 @@ const Rooms = () => {
 
   const scroll = (direction) => {
     if (scrollContainerRef.current) {
-      const cardWidth = 360 + 24 // card width + gap
-      const scrollAmount = cardWidth * 2 // scroll 2 cards at a time
+      const cardWidth = 360 + 24
+      const scrollAmount = cardWidth * 2
       const newScrollLeft = scrollContainerRef.current.scrollLeft + (direction === 'left' ? -scrollAmount : scrollAmount)
 
       scrollContainerRef.current.scrollTo({
         left: newScrollLeft,
         behavior: 'smooth'
       })
+    }
+  }
+
+  // Mobile slider navigation
+  const goToNextMobile = () => {
+    setCurrentMobileIndex((prev) => (prev + 1) % rooms.length)
+  }
+
+  const goToPrevMobile = () => {
+    setCurrentMobileIndex((prev) => (prev - 1 + rooms.length) % rooms.length)
+  }
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > minSwipeDistance
+    const isRightSwipe = distance < -minSwipeDistance
+    if (isLeftSwipe && rooms.length > 1) {
+      goToNextMobile()
+    }
+    if (isRightSwipe && rooms.length > 1) {
+      goToPrevMobile()
     }
   }
 
@@ -166,94 +257,94 @@ const Rooms = () => {
             <p className="text-gray-500">Nenhum quarto disponível no momento.</p>
           </div>
         ) : (
-          /* Slider Container */
-          <div className="relative">
-            {/* Navigation Buttons */}
-            <button
-              onClick={() => scroll('left')}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-[2] bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-300 hover:scale-110 hidden md:block"
-              aria-label="Anterior"
-            >
-              <ChevronLeftIcon className="w-6 h-6 text-primary-500" />
-            </button>
-
-            <button
-              onClick={() => scroll('right')}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-[2] bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-300 hover:scale-110 hidden md:block"
-              aria-label="Próximo"
-            >
-              <ChevronRightIcon className="w-6 h-6 text-primary-500" />
-            </button>
-
-            {/* Scrollable Container */}
-            <div
-              ref={scrollContainerRef}
-              className="flex gap-6 overflow-x-auto scroll-smooth pb-4 px-4 md:px-12 scrollbar-hide"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              {rooms.map((room, index) => (
-                <div
-                  key={room.id}
-                  className="card card-hover overflow-hidden group animate-slide-up flex-shrink-0 w-[360px]"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  {/* Image Slider */}
-                  <div className="relative h-56 overflow-hidden">
-                    <ImageSlider images={room.image_urls} roomName={room.name} />
-                    <div className="absolute top-4 right-4 bg-primary-500 text-white px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg z-20">
-                      {room.capacity} {room.capacity === 1 ? 'pessoa' : 'pessoas'}
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-5">
-                    <h3 className="text-xl font-display font-bold text-gray-900 mb-2">
-                      {room.name}
-                    </h3>
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                      {room.description}
-                    </p>
-
-                    {/* Features */}
-                    {room.amenities && room.amenities.length > 0 && (
-                      <ul className="space-y-1.5 mb-5">
-                        {room.amenities.slice(0, 5).map((feature, idx) => (
-                          <li key={idx} className="flex items-center text-sm text-gray-700">
-                            <svg className="w-4 h-4 text-primary-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+          <>
+            {/* Mobile Slider - Um card por vez */}
+            <div className="md:hidden">
+              <div
+                className="relative"
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+              >
+                {/* Navigation Buttons */}
+                {rooms.length > 1 && (
+                  <>
+                    <button
+                      onClick={goToPrevMobile}
+                      className="absolute left-0 top-1/2 -translate-y-1/2 z-[2] bg-white/90 shadow-lg rounded-full p-2 -ml-2"
+                      aria-label="Anterior"
+                    >
+                      <ChevronLeftIcon className="w-5 h-5 text-primary-500" />
+                    </button>
 
                     <button
-                      onClick={() => {
-                        // Scroll para o formulário
-                        const bookingForm = document.getElementById('booking-form')
-                        if (bookingForm) {
-                          bookingForm.scrollIntoView({ behavior: 'smooth', block: 'center' })
-                          // Disparar evento para highlight
-                          setTimeout(() => {
-                            window.dispatchEvent(new CustomEvent('highlightBookingForm'))
-                          }, 500)
-                        }
-                      }}
-                      className="btn-primary w-full text-center block text-sm py-2.5"
+                      onClick={goToNextMobile}
+                      className="absolute right-0 top-1/2 -translate-y-1/2 z-[2] bg-white/90 shadow-lg rounded-full p-2 -mr-2"
+                      aria-label="Próximo"
                     >
-                      Consultar disponibilidade
+                      <ChevronRightIcon className="w-5 h-5 text-primary-500" />
                     </button>
-                  </div>
+                  </>
+                )}
+
+                {/* Card Container */}
+                <div className="px-6">
+                  <RoomCard room={rooms[currentMobileIndex]} index={0} />
                 </div>
-              ))}
+
+                {/* Indicadores de posição */}
+                {rooms.length > 1 && (
+                  <div className="flex justify-center gap-2 mt-4">
+                    {rooms.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setCurrentMobileIndex(idx)}
+                        className={`w-2.5 h-2.5 rounded-full transition-all duration-200 ${
+                          idx === currentMobileIndex
+                            ? 'bg-primary-500 w-6'
+                            : 'bg-gray-300 hover:bg-gray-400'
+                        }`}
+                        aria-label={`Ir para quarto ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Scroll Indicator */}
-            <div className="text-center mt-6 md:hidden">
-              <p className="text-sm text-gray-500">← Deslize para ver mais →</p>
+            {/* Desktop Slider - Múltiplos cards */}
+            <div className="hidden md:block relative">
+              {/* Navigation Buttons */}
+              <button
+                onClick={() => scroll('left')}
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-[2] bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-300 hover:scale-110"
+                aria-label="Anterior"
+              >
+                <ChevronLeftIcon className="w-6 h-6 text-primary-500" />
+              </button>
+
+              <button
+                onClick={() => scroll('right')}
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-[2] bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-300 hover:scale-110"
+                aria-label="Próximo"
+              >
+                <ChevronRightIcon className="w-6 h-6 text-primary-500" />
+              </button>
+
+              {/* Scrollable Container */}
+              <div
+                ref={scrollContainerRef}
+                className="flex gap-6 overflow-x-auto scroll-smooth pb-4 px-12 scrollbar-hide"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                {rooms.map((room, index) => (
+                  <div key={room.id} className="flex-shrink-0 w-[360px]">
+                    <RoomCard room={room} index={index} />
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          </>
         )}
       </div>
     </section>
