@@ -45,3 +45,7 @@ lerna-debug.log*
 
 # Claude
 .claude/
+
+# Cloudflare Wrangler
+.dev.vars
+.wrangler/

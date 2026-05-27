@@ -1,0 +1,21 @@
+name = "praiabela"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-05-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ADMIN_EMAIL = "admin@praiabela.com"
+AWS_REGION = "us-east-2"
+AWS_BUCKET_NAME = "hoteloshia"
+AWS_S3_ENDPOINT = "https://s3.us-east-2.amazonaws.com"
+CORS_ORIGINS = "https://praiabela.pages.dev,https://www.praiabela.com.br"
+
+# Secrets (set via dashboard or `wrangler pages secret put <NAME>`):
+#   JWT_SECRET, ADMIN_PASSWORD, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+
+# D1 binding — create with: wrangler d1 create praiabela-db
+# then paste the database_id below
+[[d1_databases]]
+binding = "DB"
+database_name = "praiabela-db"
+database_id = "PASTE_DATABASE_ID_HERE_AFTER_wrangler_d1_create"

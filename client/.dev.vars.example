@@ -1,0 +1,8 @@
+# Local secrets for `wrangler pages dev`. Copy to `.dev.vars` (gitignored).
+# Do NOT commit real secrets.
+
+JWT_SECRET=local_dev_secret_change_me_in_production
+ADMIN_PASSWORD=admin123
+
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
