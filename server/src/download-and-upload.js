@@ -1,4 +1,5 @@
-import AWS from 'aws-sdk'
+import { S3Client } from '@aws-sdk/client-s3'
+import { Upload } from '@aws-sdk/lib-storage'
 import https from 'https'
 import http from 'http'
 import { initDatabase, saveDatabase } from './config/database.js'
@@ -7,11 +8,12 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-// Configure AWS S3
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+const s3 = new S3Client({
   region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
 })
 
 // URLs das imagens do site original da Pousada Praia Bela
@@ -116,16 +118,18 @@ const downloadImage = (url) => {
 const uploadToS3 = async (buffer, filename) => {
   const key = `gallery/${Date.now()}-${filename}`
 
-  const params = {
-    Bucket: process.env.AWS_BUCKET_NAME,
-    Key: key,
-    Body: buffer,
-    ContentType: 'image/jpeg',
-    ACL: 'public-read',
-  }
-
   try {
-    const result = await s3.upload(params).promise()
+    const upload = new Upload({
+      client: s3,
+      params: {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: key,
+        Body: buffer,
+        ContentType: 'image/jpeg',
+        ACL: 'public-read',
+      },
+    })
+    const result = await upload.done()
     return {
       url: result.Location,
       key: result.Key,

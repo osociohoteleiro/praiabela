@@ -1,4 +1,5 @@
-import AWS from 'aws-sdk'
+import { S3Client } from '@aws-sdk/client-s3'
+import { Upload } from '@aws-sdk/lib-storage'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -11,11 +12,12 @@ dotenv.config()
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Configure AWS S3
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+const s3 = new S3Client({
   region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
 })
 
 const galleryDir = path.join(__dirname, '../../client/public/gallery')
@@ -75,16 +77,18 @@ const uploadToS3 = async (filePath, filename) => {
 
   const key = `gallery/${Date.now()}-${filename}`
 
-  const params = {
-    Bucket: process.env.AWS_BUCKET_NAME,
-    Key: key,
-    Body: fileContent,
-    ContentType: contentType,
-    ACL: 'public-read',
-  }
-
   try {
-    const result = await s3.upload(params).promise()
+    const upload = new Upload({
+      client: s3,
+      params: {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: key,
+        Body: fileContent,
+        ContentType: contentType,
+        ACL: 'public-read',
+      },
+    })
+    const result = await upload.done()
     console.log(`✅ Uploaded: ${filename} -> ${result.Location}`)
     return {
       url: result.Location,
