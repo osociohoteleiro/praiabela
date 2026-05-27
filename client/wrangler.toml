@@ -18,4 +18,4 @@ CORS_ORIGINS = "https://praiabela.pages.dev,https://www.praiabela.com.br"
 [[d1_databases]]
 binding = "DB"
 database_name = "praiabela-db"
-database_id = "PASTE_DATABASE_ID_HERE_AFTER_wrangler_d1_create"
+database_id = "168e85a7-1507-4f29-9873-1a83e37975ec"
