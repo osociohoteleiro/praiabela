@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Bars3Icon, XMarkIcon, HomeIcon } from '@heroicons/react/24/outline'
 
 const Navbar = () => {
@@ -6,6 +7,9 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isTourActive, setIsTourActive] = useState(false)
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
+  const location = useLocation()
+  const navigate = useNavigate()
+  const isHome = location.pathname === '/'
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,9 +39,9 @@ const Navbar = () => {
     { name: 'Início', href: '#home' },
     { name: 'Sobre', href: '#about' },
     { name: 'Pacotes', href: '#packages' },
-    { name: 'Promoções', href: '#promotions' },
     { name: 'Acomodações', href: '#rooms' },
     { name: 'Galeria', href: '#gallery' },
+    { name: 'Blog', href: '/blog', route: true },
     { name: 'Contato', href: '#contact' },
   ]
 
@@ -47,11 +51,26 @@ const Navbar = () => {
 
   const scrollToSection = (href) => {
     closeBookingModal()
+    if (!isHome) {
+      navigate('/', { state: { scrollTo: href } })
+      setIsMobileMenuOpen(false)
+      return
+    }
     const element = document.querySelector(href)
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' })
     }
     setIsMobileMenuOpen(false)
+  }
+
+  const handleNavClick = (link) => {
+    closeBookingModal()
+    if (link.route) {
+      navigate(link.href)
+      setIsMobileMenuOpen(false)
+      return
+    }
+    scrollToSection(link.href)
   }
 
   const openBookingModal = () => {
@@ -83,7 +102,7 @@ const Navbar = () => {
                   href={link.href}
                   onClick={(e) => {
                     e.preventDefault()
-                    scrollToSection(link.href)
+                    handleNavClick(link)
                   }}
                   className="font-medium transition-colors duration-200 text-white hover:text-accent-300 drop-shadow"
                 >
@@ -121,7 +140,7 @@ const Navbar = () => {
                     href={link.href}
                     onClick={(e) => {
                       e.preventDefault()
-                      scrollToSection(link.href)
+                      handleNavClick(link)
                     }}
                     className="text-gray-700 hover:text-primary-500 font-medium transition-colors"
                   >
@@ -174,7 +193,7 @@ const Navbar = () => {
             {navLinks.slice(1).map((link) => (
               <button
                 key={link.name}
-                onClick={() => scrollToSection(link.href)}
+                onClick={() => handleNavClick(link)}
                 className="p-3 rounded-xl text-gray-600 hover:text-primary-500 hover:bg-primary-50 transition-colors group relative"
                 title={link.name}
               >

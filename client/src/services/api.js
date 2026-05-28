@@ -80,6 +80,9 @@ export const mediaAPI = {
   uploadImage: (formData) => api.post('/upload/image', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   }),
+  uploadImages: (formData) => api.post('/upload/images', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
   uploadVideo: (formData) => api.post('/upload/video', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   }),
@@ -106,6 +109,18 @@ export const experiencesAPI = {
   update: (id, data) => api.put(`/experiences/${id}`, data),
   delete: (id) => api.delete(`/experiences/${id}`),
   reorder: (items) => api.put('/experiences/reorder/batch', { items }),
+}
+
+// Posts (Blog) endpoints
+export const postsAPI = {
+  getAll: (params = {}) => api.get('/posts', { params }),
+  getAllAdmin: () => api.get('/posts/admin/all'),
+  getCategories: () => api.get('/posts/categories'),
+  getById: (id) => api.get(`/posts/${id}`),
+  getBySlug: (slug) => api.get(`/posts/slug/${slug}`),
+  create: (data) => api.post('/posts', data),
+  update: (id, data) => api.put(`/posts/${id}`, data),
+  delete: (id) => api.delete(`/posts/${id}`),
 }
 
 export default api

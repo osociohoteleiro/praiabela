@@ -17,7 +17,7 @@ router.post('/import', authMiddleware, async (req, res) => {
     const results = {};
 
     // Importar cada tabela
-    const tables = ['site_info', 'rooms', 'gallery', 'packages', 'promotions', 'experiences', 'media'];
+    const tables = ['site_info', 'rooms', 'gallery', 'packages', 'promotions', 'experiences', 'posts', 'media'];
 
     for (const table of tables) {
       if (data[table] && Array.isArray(data[table])) {
@@ -58,7 +58,7 @@ router.post('/import', authMiddleware, async (req, res) => {
 // Endpoint para exportar dados (GET)
 router.get('/export', authMiddleware, async (req, res) => {
   try {
-    const tables = ['site_info', 'rooms', 'gallery', 'packages', 'promotions', 'experiences', 'media'];
+    const tables = ['site_info', 'rooms', 'gallery', 'packages', 'promotions', 'experiences', 'posts', 'media'];
     const data = {};
 
     for (const table of tables) {

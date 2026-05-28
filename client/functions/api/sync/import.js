@@ -1,7 +1,7 @@
 import { json, badRequest, serverError } from '../../_lib/response.js'
 import { requireAuth } from '../../_lib/auth.js'
 
-const TABLES = ['site_info', 'rooms', 'gallery', 'packages', 'promotions', 'experiences', 'media']
+const TABLES = ['site_info', 'rooms', 'gallery', 'packages', 'promotions', 'experiences', 'posts', 'media']
 
 export async function onRequestPost({ request, env }) {
   const auth = await requireAuth(request, env)

@@ -1,5 +1,6 @@
 import { applyCors, preflight } from '../_lib/cors.js'
 import { serverError } from '../_lib/response.js'
+import { ensureSchema } from '../_lib/schema.js'
 
 export async function onRequest(context) {
   const { request, env, next } = context
@@ -9,6 +10,7 @@ export async function onRequest(context) {
   }
 
   try {
+    await ensureSchema(env)
     const response = await next()
     return applyCors(response, request, env)
   } catch (err) {

@@ -153,6 +153,25 @@ export const initDatabase = async () => {
       )
     `);
 
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS posts (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        slug VARCHAR(255) UNIQUE NOT NULL,
+        excerpt TEXT,
+        content TEXT NOT NULL,
+        cover_image TEXT NOT NULL,
+        category VARCHAR(100),
+        published_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        is_active INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_posts_slug ON posts(slug)`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_posts_active_pub ON posts(is_active, published_at DESC)`);
+
     console.log('✅ Tabelas criadas');
 
     // Create default admin user if not exists

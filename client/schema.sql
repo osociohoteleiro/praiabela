@@ -1,5 +1,11 @@
 -- D1 (SQLite) schema for Pousada Praia Bela
 -- Port of server/src/config/database.js Postgres schema
+--
+-- In production this schema is also applied automatically on the first request
+-- to /api/* by functions/_lib/schema.js (called from functions/api/_middleware.js).
+-- Keep this file and _lib/schema.js in sync when adding/altering tables.
+-- This .sql file is still used for `npm run db:migrate:local` and one-shot
+-- remote bootstrap via `npm run db:migrate:remote`.
 
 CREATE TABLE IF NOT EXISTS admins (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -21,15 +27,18 @@ CREATE TABLE IF NOT EXISTS promotions (
   updated_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
+-- price = 0 acts as a "Sob consulta" sentinel (no NOT NULL relax needed in SQLite)
 CREATE TABLE IF NOT EXISTS packages (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
   description TEXT NOT NULL,
-  price REAL NOT NULL,
+  price REAL NOT NULL DEFAULT 0,
   inclusions TEXT NOT NULL,
   image_urls TEXT,
   is_featured INTEGER DEFAULT 0,
   is_active INTEGER DEFAULT 1,
+  start_date TEXT,
+  end_date TEXT,
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
@@ -94,6 +103,23 @@ CREATE TABLE IF NOT EXISTS experiences (
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS posts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  excerpt TEXT,
+  content TEXT NOT NULL,
+  cover_image TEXT NOT NULL,
+  category TEXT,
+  published_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  is_active INTEGER DEFAULT 1,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_posts_slug ON posts(slug);
+CREATE INDEX IF NOT EXISTS idx_posts_active_pub ON posts(is_active, published_at DESC);
 
 -- Seed default site_info (id=1) if it doesn't exist
 INSERT OR IGNORE INTO site_info (

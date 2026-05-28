@@ -8,16 +8,21 @@ import Home from './pages/Home'
 // Admin Layout (eager loading to prevent flashing)
 import AdminLayout from './components/AdminLayout'
 import ProtectedRoute from './components/ProtectedRoute'
+import AnalyticsRouteTracker from './components/AnalyticsRouteTracker'
+
+// Public Blog Pages (lazy loading)
+const Blog = lazy(() => import('./pages/Blog'))
+const BlogPost = lazy(() => import('./pages/BlogPost'))
 
 // Admin Pages (lazy loading)
 const AdminLogin = lazy(() => import('./pages/Admin/Login'))
 const AdminDashboard = lazy(() => import('./pages/Admin/Dashboard'))
-const AdminPromotions = lazy(() => import('./pages/Admin/Promotions'))
 const AdminPackages = lazy(() => import('./pages/Admin/Packages'))
 const AdminRooms = lazy(() => import('./pages/Admin/Rooms'))
 const AdminSiteInfo = lazy(() => import('./pages/Admin/SiteInfo'))
 const AdminGallery = lazy(() => import('./pages/Admin/GalleryManager'))
 const AdminExperiences = lazy(() => import('./pages/Admin/ExperiencesManager'))
+const AdminPosts = lazy(() => import('./pages/Admin/PostsManager'))
 
 // Loading component for login page
 const LoadingFallback = () => (
@@ -33,9 +38,26 @@ function App() {
   return (
     <AdminProvider>
       <Router>
+        <AnalyticsRouteTracker />
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
+          <Route
+            path="/blog"
+            element={
+              <Suspense fallback={<LoadingFallback />}>
+                <Blog />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/blog/:slug"
+            element={
+              <Suspense fallback={<LoadingFallback />}>
+                <BlogPost />
+              </Suspense>
+            }
+          />
 
           {/* Admin Login (outside layout) */}
           <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
@@ -57,10 +79,10 @@ function App() {
             }
           >
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/promotions" element={<AdminPromotions />} />
             <Route path="/admin/packages" element={<AdminPackages />} />
             <Route path="/admin/rooms" element={<AdminRooms />} />
             <Route path="/admin/experiences" element={<AdminExperiences />} />
+            <Route path="/admin/posts" element={<AdminPosts />} />
             <Route path="/admin/gallery" element={<AdminGallery />} />
             <Route path="/admin/site-info" element={<AdminSiteInfo />} />
           </Route>

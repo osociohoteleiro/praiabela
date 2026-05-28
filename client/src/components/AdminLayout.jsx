@@ -3,13 +3,13 @@ import { useAdmin } from '../context/AdminContext'
 import { Suspense } from 'react'
 import {
   HomeIcon,
-  TagIcon,
   CubeIcon,
   HomeModernIcon,
   InformationCircleIcon,
   ArrowLeftOnRectangleIcon,
   RectangleStackIcon,
   HeartIcon,
+  NewspaperIcon,
 } from '@heroicons/react/24/outline'
 
 const ContentLoader = () => (
@@ -25,10 +25,10 @@ const AdminLayout = ({ children }) => {
 
   const navItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: HomeIcon },
-    { name: 'Promoções', path: '/admin/promotions', icon: TagIcon },
     { name: 'Pacotes', path: '/admin/packages', icon: CubeIcon },
     { name: 'Quartos', path: '/admin/rooms', icon: HomeModernIcon },
     { name: 'Experiências', path: '/admin/experiences', icon: HeartIcon },
+    { name: 'Blog', path: '/admin/posts', icon: NewspaperIcon },
     { name: 'Galeria', path: '/admin/gallery', icon: RectangleStackIcon },
     { name: 'Info do Site', path: '/admin/site-info', icon: InformationCircleIcon },
   ]

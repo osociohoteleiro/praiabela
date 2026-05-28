@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { siteInfoAPI } from '../services/api'
 
 const Footer = () => {
@@ -52,6 +53,11 @@ const Footer = () => {
                   </a>
                 </li>
               ))}
+              <li>
+                <Link to="/blog" className="text-gray-400 hover:text-white transition-colors">
+                  Blog
+                </Link>
+              </li>
             </ul>
           </div>
 

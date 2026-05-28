@@ -16,6 +16,7 @@ import siteInfoRoutes from './routes/siteInfo.js'
 import uploadRoutes from './routes/upload.js'
 import galleryRoutes from './routes/gallery.js'
 import experiencesRoutes from './routes/experiences.js'
+import postsRoutes from './routes/posts.js'
 import syncRoutes from './routes/sync.js'
 
 dotenv.config()
@@ -73,6 +74,7 @@ app.use('/api/site-info', siteInfoRoutes)
 app.use('/api/upload', uploadRoutes)
 app.use('/api/gallery', galleryRoutes)
 app.use('/api/experiences', experiencesRoutes)
+app.use('/api/posts', postsRoutes)
 app.use('/api/sync', syncRoutes)
 
 // Health check
