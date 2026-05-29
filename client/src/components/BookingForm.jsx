@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { CalendarIcon, UserGroupIcon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { siteInfoAPI } from '../services/api'
 
 const BookingForm = () => {
   const [checkIn, setCheckIn] = useState(null)
@@ -15,10 +16,15 @@ const BookingForm = () => {
   const [showBookingModal, setShowBookingModal] = useState(false)
   const [bookingUrl, setBookingUrl] = useState('')
   const [isLoadingBooking, setIsLoadingBooking] = useState(false)
+  const [siteInfo, setSiteInfo] = useState(null)
   const formRef = useRef(null)
   const placeholderRef = useRef(null)
   const checkInRef = useRef(null)
   const checkOutRef = useRef(null)
+
+  useEffect(() => {
+    siteInfoAPI.get().then(({ data }) => setSiteInfo(data)).catch(() => {})
+  }, [])
 
   useEffect(() => {
     let ticking = false
@@ -517,9 +523,9 @@ const BookingForm = () => {
           </div>
         </form>
 
-        {!isSticky && (
+        {!isSticky && siteInfo?.contact_phone && (
           <p className="text-center text-sm text-gray-500 mt-4">
-            Ou ligue para <a href="tel:+557398664644" className="text-primary-500 font-semibold hover:underline">(73) 9866-4644</a>
+            Ou ligue para <a href={`tel:+55${siteInfo.contact_phone.replace(/\D/g, '').replace(/^55/, '')}`} className="text-primary-500 font-semibold hover:underline">{siteInfo.contact_phone}</a>
           </p>
         )}
       </div>
