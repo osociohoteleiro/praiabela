@@ -36,6 +36,6 @@ export async function onRequestPost({ request, env }) {
     return json({ message: 'Upload realizado com sucesso', ...result })
   } catch (err) {
     console.error('Video upload error:', err)
-    return serverError('Erro ao fazer upload do vídeo')
+    return serverError(`Erro ao fazer upload do vídeo: ${err.message || err.name || 'desconhecido'}`)
   }
 }

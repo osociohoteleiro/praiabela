@@ -11,10 +11,13 @@ const Packages = () => {
     name: '',
     description: '',
     price: '',
+    price_on_request: false,
     inclusions: [''],
     image_urls: [],
     is_featured: false,
     is_active: true,
+    start_date: '',
+    end_date: '',
   })
   const [uploadingImage, setUploadingImage] = useState(false)
   const [deleteModal, setDeleteModal] = useState({ show: false, pkg: null })
@@ -70,11 +73,15 @@ const Packages = () => {
     const filteredInclusions = formData.inclusions.filter(inc => inc.trim() !== '')
 
     const packageData = {
-      ...formData,
+      name: formData.name,
+      description: formData.description,
       inclusions: filteredInclusions,
-      price: parseFloat(formData.price),
+      image_urls: formData.image_urls,
+      price: formData.price_on_request ? 0 : (parseFloat(formData.price) || 0),
       is_featured: formData.is_featured ? 1 : 0,
       is_active: formData.is_active ? 1 : 0,
+      start_date: formData.start_date || null,
+      end_date: formData.end_date || null,
     }
 
     try {
@@ -115,15 +122,19 @@ const Packages = () => {
 
   const openModal = (pkg = null) => {
     if (pkg) {
+      const onRequest = !pkg.price || pkg.price === 0
       setEditingPackage(pkg)
       setFormData({
         name: pkg.name,
         description: pkg.description,
-        price: pkg.price.toString(),
+        price: onRequest ? '' : pkg.price.toString(),
+        price_on_request: onRequest,
         inclusions: pkg.inclusions.length > 0 ? pkg.inclusions : [''],
         image_urls: pkg.image_urls || [],
         is_featured: pkg.is_featured === 1,
         is_active: pkg.is_active === 1,
+        start_date: pkg.start_date || '',
+        end_date: pkg.end_date || '',
       })
     } else {
       setEditingPackage(null)
@@ -131,10 +142,13 @@ const Packages = () => {
         name: '',
         description: '',
         price: '',
+        price_on_request: false,
         inclusions: [''],
         image_urls: [],
         is_featured: false,
         is_active: true,
+        start_date: '',
+        end_date: '',
       })
     }
     setShowModal(true)
@@ -226,9 +240,18 @@ const Packages = () => {
                 <p className="text-gray-600 mb-4">{pkg.description}</p>
 
                 <div className="mb-4">
-                  <span className="text-3xl font-bold text-primary-600">
-                    R$ {pkg.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </span>
+                  {pkg.price > 0 ? (
+                    <span className="text-3xl font-bold text-primary-600">
+                      R$ {pkg.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </span>
+                  ) : (
+                    <span className="text-2xl font-bold text-gray-500 italic">Sob consulta</span>
+                  )}
+                  {(pkg.start_date || pkg.end_date) && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Período: {pkg.start_date || '—'} → {pkg.end_date || '—'}
+                    </p>
+                  )}
                 </div>
 
                 <div className="mb-4">
@@ -300,16 +323,55 @@ const Packages = () => {
                   </div>
 
                   <div>
-                    <label className="input-label">Preço (R$)</label>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="input-label !mb-0">Preço (R$)</label>
+                      <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.price_on_request}
+                          onChange={(e) => setFormData({ ...formData, price_on_request: e.target.checked })}
+                          className="w-4 h-4 text-primary-600 rounded"
+                        />
+                        Sob consulta
+                      </label>
+                    </div>
                     <input
                       type="number"
                       step="0.01"
-                      value={formData.price}
+                      min="0"
+                      value={formData.price_on_request ? '' : formData.price}
                       onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                      required
-                      className="input-field"
+                      disabled={formData.price_on_request}
+                      placeholder={formData.price_on_request ? 'Sob consulta — sem preço fixo' : '0,00'}
+                      required={!formData.price_on_request}
+                      className="input-field disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
                     />
                   </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="input-label">Válido a partir de (opcional)</label>
+                      <input
+                        type="date"
+                        value={formData.start_date}
+                        onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                        className="input-field"
+                      />
+                    </div>
+                    <div>
+                      <label className="input-label">Válido até (opcional)</label>
+                      <input
+                        type="date"
+                        value={formData.end_date}
+                        min={formData.start_date || undefined}
+                        onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+                        className="input-field"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 -mt-3">
+                    As datas serão usadas pré-preenchidas no motor de reservas quando o cliente clicar em "Consultar".
+                  </p>
 
                   <div>
                     <label className="input-label">Inclusões</label>

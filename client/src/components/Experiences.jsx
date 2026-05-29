@@ -42,7 +42,7 @@ const Experiences = () => {
   const loadExperiences = async () => {
     try {
       const { data } = await experiencesAPI.getAll()
-      setExperiences(data)
+      setExperiences(Array.isArray(data) ? data : [])
     } catch (error) {
       console.error('Error loading experiences:', error)
     } finally {

@@ -36,6 +36,6 @@ export async function onRequestPost({ request, env }) {
     return json({ message: 'Upload realizado com sucesso', ...result })
   } catch (err) {
     console.error('Image upload error:', err)
-    return serverError('Erro ao fazer upload da imagem')
+    return serverError(`Erro ao fazer upload da imagem: ${err.message || err.name || 'desconhecido'}`)
   }
 }

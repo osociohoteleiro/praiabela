@@ -71,6 +71,10 @@ export default {
         'slide-up': 'slideUp 0.6s ease-out',
         'slide-down': 'slideDown 0.6s ease-out',
         'scale-in': 'scaleIn 0.4s ease-out',
+        'wa-pulse-1': 'waPulse 2.4s ease-out infinite',
+        'wa-pulse-2': 'waPulse 2.4s ease-out infinite 0.8s',
+        'wa-pulse-3': 'waPulse 2.4s ease-out infinite 1.6s',
+        'wa-wobble': 'waWobble 3s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -88,6 +92,19 @@ export default {
         scaleIn: {
           '0%': { transform: 'scale(0.9)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        waPulse: {
+          '0%': { transform: 'scale(1)', opacity: '0.6' },
+          '70%': { opacity: '0' },
+          '100%': { transform: 'scale(1.9)', opacity: '0' },
+        },
+        waWobble: {
+          '0%, 60%, 100%': { transform: 'rotate(0deg)' },
+          '5%': { transform: 'rotate(-12deg)' },
+          '10%': { transform: 'rotate(12deg)' },
+          '15%': { transform: 'rotate(-8deg)' },
+          '20%': { transform: 'rotate(8deg)' },
+          '25%': { transform: 'rotate(0deg)' },
         },
       },
     },

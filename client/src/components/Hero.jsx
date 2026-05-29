@@ -1,10 +1,9 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
+
+const heroImageUrl = '/hero.jpg'
 
 const Hero = () => {
-  const tourUrl = 'https://tourmkr.com/F1biwwjN1X/46253449p&346.86h&78.42t&autorotate=true'
-  const [isInteracting, setIsInteracting] = useState(false)
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
-  const timeoutRef = useRef(null)
 
   const scrollToBooking = () => {
     const bookingSection = document.getElementById('booking-form')
@@ -13,38 +12,9 @@ const Hero = () => {
     }
   }
 
-  const startInteraction = () => {
-    setIsInteracting(true)
-    // Dispatch event to hide navbar
-    window.dispatchEvent(new CustomEvent('tourInteraction', { detail: true }))
-
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-    }
-  }
-
-  const exitTour = () => {
-    setIsInteracting(false)
-    window.dispatchEvent(new CustomEvent('tourInteraction', { detail: false }))
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-    }
-  }
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
-    }
-  }, [])
-
-  // Listen for booking modal events
   useEffect(() => {
     const handleOpenBookingModal = () => setIsBookingModalOpen(true)
     const handleCloseBookingModal = () => setIsBookingModalOpen(false)
-
     window.addEventListener('openBookingModal', handleOpenBookingModal)
     window.addEventListener('closeBookingModal', handleCloseBookingModal)
     return () => {
@@ -55,36 +25,20 @@ const Hero = () => {
 
   return (
     <div className="relative h-screen w-full overflow-hidden">
-      {/* Tour Virtual 360° Background */}
-      <iframe
-        src={tourUrl}
-        className={`absolute inset-0 w-full h-full border-0 ${isInteracting ? 'z-[60]' : 'z-0'}`}
-        allowFullScreen
-        allow="accelerometer; gyroscope; vr; xr"
-        title="Tour Virtual 360° - Pousada Praia Bela"
+      {/* Background image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url('${heroImageUrl}')` }}
       />
 
-      {/* Gradiente no topo para destacar o menu */}
-      <div
-        className={`absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black/50 to-transparent z-[5] pointer-events-none transition-opacity duration-300 ${
-          isInteracting ? 'opacity-0' : 'opacity-100'
-        }`}
-      />
+      {/* Top gradient (helps navbar contrast) */}
+      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black/50 to-transparent z-[5] pointer-events-none" />
 
-      {/* Gradiente no centro/baixo para destacar o conteúdo */}
-      <div
-        className={`absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent z-[5] pointer-events-none transition-opacity duration-300 ${
-          isInteracting ? 'opacity-0' : 'opacity-100'
-        }`}
-      />
+      {/* Bottom/center gradient (helps text contrast) */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/20 z-[5] pointer-events-none" />
 
-      {/* Content - clicável para iniciar interação */}
-      <div
-        className={`absolute inset-0 flex items-center justify-center text-center px-4 z-10 cursor-pointer transition-opacity duration-300 ${
-          isInteracting ? 'opacity-0 pointer-events-none' : 'opacity-100'
-        }`}
-        onClick={startInteraction}
-      >
+      {/* Content */}
+      <div className="absolute inset-0 flex items-center justify-center text-center px-4 z-10">
         <div className="max-w-4xl">
           <h1 className="font-display text-5xl md:text-7xl lg:text-8xl text-white font-bold mb-6 animate-slide-down drop-shadow-lg">
             Pousada Praia Bela
@@ -100,17 +54,13 @@ const Hero = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-scale-in" style={{ animationDelay: '0.4s' }}>
             <button
-              onClick={(e) => {
-                e.stopPropagation()
-                scrollToBooking()
-              }}
+              onClick={scrollToBooking}
               className="btn-primary text-lg px-8 py-4"
             >
               Reserve Agora
             </button>
             <a
               href="#about"
-              onClick={(e) => e.stopPropagation()}
               className="btn-secondary text-lg px-8 py-4"
             >
               Conheça Mais
@@ -118,32 +68,6 @@ const Hero = () => {
           </div>
         </div>
       </div>
-
-      {/* Botão Tour Virtual 360° - aparece quando NÃO está interagindo e modal fechado */}
-      <button
-        onClick={startInteraction}
-        className={`absolute bottom-28 left-1/2 transform -translate-x-1/2 z-[15] bg-white/90 hover:bg-white text-gray-800 font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 flex items-center gap-2 ${
-          isInteracting || isBookingModalOpen ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'
-        }`}
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-        </svg>
-        Tour Virtual 360°
-      </button>
-
-      {/* Botão Sair do Tour - aparece quando ESTÁ interagindo */}
-      <button
-        onClick={exitTour}
-        className={`absolute bottom-28 left-1/2 transform -translate-x-1/2 z-[70] bg-white/90 hover:bg-white text-gray-800 font-semibold px-6 py-3 rounded-full shadow-lg transition-all duration-300 flex items-center gap-2 ${
-          isInteracting ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
-        }`}
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-        Sair do Tour
-      </button>
     </div>
   )
 }

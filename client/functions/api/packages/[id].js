@@ -32,7 +32,7 @@ export async function onRequestPut({ request, params, env }) {
     return badRequest('JSON inválido')
   }
 
-  const { name, description, price, inclusions, image_urls, is_featured, is_active } = body || {}
+  const { name, description, price, inclusions, image_urls, is_featured, is_active, start_date, end_date } = body || {}
 
   try {
     const exists = await env.DB.prepare('SELECT id FROM packages WHERE id = ?')
@@ -41,17 +41,19 @@ export async function onRequestPut({ request, params, env }) {
 
     const result = await env.DB.prepare(`
       UPDATE packages
-      SET name = ?, description = ?, price = ?, inclusions = ?, image_urls = ?, is_featured = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP
+      SET name = ?, description = ?, price = ?, inclusions = ?, image_urls = ?, is_featured = ?, is_active = ?, start_date = ?, end_date = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
       RETURNING *
     `).bind(
       name,
       description,
-      price,
+      Number(price) || 0,
       JSON.stringify(inclusions),
       JSON.stringify(image_urls || []),
       is_featured ? 1 : 0,
       is_active !== undefined ? (is_active ? 1 : 0) : 1,
+      start_date || null,
+      end_date || null,
       params.id
     ).first()
 

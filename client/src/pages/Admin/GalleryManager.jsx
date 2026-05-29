@@ -28,10 +28,10 @@ const GalleryManager = () => {
   const fileInputRef = useRef(null)
   const editFileInputRef = useRef(null)
 
-  // Form state for adding new image
-  const [newImageFile, setNewImageFile] = useState(null)
-  const [newImagePreview, setNewImagePreview] = useState('')
-  const [newImageCaption, setNewImageCaption] = useState('')
+  // Form state for adding new images (multi-upload)
+  // Each item: { id, file, preview, caption }
+  const [newImages, setNewImages] = useState([])
+  const [uploadProgress, setUploadProgress] = useState({ done: 0, total: 0 })
 
   useEffect(() => {
     loadData()
@@ -48,32 +48,55 @@ const GalleryManager = () => {
     }
   }
 
-  // Handle file selection
-  const handleFileSelect = (file, isEdit = false) => {
-    if (!file) return
+  const validTypes = ['image/jpeg', 'image/png', 'image/webp']
+  const maxSize = 5 * 1024 * 1024
 
-    // Validate file type
-    const validTypes = ['image/jpeg', 'image/png', 'image/webp']
+  // Append a list of files into newImages (multi mode)
+  const addFiles = (fileList) => {
+    const files = Array.from(fileList || [])
+    const accepted = []
+    for (const file of files) {
+      if (!validTypes.includes(file.type)) {
+        alert(`"${file.name}": formato inválido (use JPG, PNG ou WEBP).`)
+        continue
+      }
+      if (file.size > maxSize) {
+        alert(`"${file.name}": maior que 5MB.`)
+        continue
+      }
+      accepted.push(file)
+    }
+    accepted.forEach((file) => {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setNewImages((prev) => [
+          ...prev,
+          {
+            id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+            file,
+            preview: e.target.result,
+            caption: '',
+          },
+        ])
+      }
+      reader.readAsDataURL(file)
+    })
+  }
+
+  // Edit modal: still single-file replacement
+  const handleEditFileSelect = (file) => {
+    if (!file) return
     if (!validTypes.includes(file.type)) {
       alert('Formato inválido. Use JPG, PNG ou WEBP.')
       return
     }
-
-    // Validate file size (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
+    if (file.size > maxSize) {
       alert('Arquivo muito grande. Máximo 5MB.')
       return
     }
-
-    // Create preview
     const reader = new FileReader()
     reader.onload = (e) => {
-      if (isEdit) {
-        setEditingImage({ ...editingImage, newFile: file, newPreview: e.target.result })
-      } else {
-        setNewImageFile(file)
-        setNewImagePreview(e.target.result)
-      }
+      setEditingImage({ ...editingImage, newFile: file, newPreview: e.target.result })
     }
     reader.readAsDataURL(file)
   }
@@ -93,42 +116,75 @@ const GalleryManager = () => {
     e.preventDefault()
     e.stopPropagation()
     setDragActive(false)
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFileSelect(e.dataTransfer.files[0], isEdit)
+    if (!e.dataTransfer.files || e.dataTransfer.files.length === 0) return
+    if (isEdit) {
+      handleEditFileSelect(e.dataTransfer.files[0])
+    } else {
+      addFiles(e.dataTransfer.files)
     }
   }
 
-  const handleAddImage = async () => {
-    if (!newImageFile) {
-      alert('Selecione uma imagem para fazer upload')
+  const removeNewImage = (id) => {
+    setNewImages((prev) => prev.filter((img) => img.id !== id))
+  }
+
+  const updateNewImageCaption = (id, caption) => {
+    setNewImages((prev) => prev.map((img) => (img.id === id ? { ...img, caption } : img)))
+  }
+
+  const resetAddModal = () => {
+    setShowAddModal(false)
+    setNewImages([])
+    setUploadProgress({ done: 0, total: 0 })
+  }
+
+  const handleAddImages = async () => {
+    if (newImages.length === 0) {
+      alert('Selecione ao menos uma imagem para fazer upload')
       return
     }
 
     setUploading(true)
+    setUploadProgress({ done: 0, total: newImages.length })
+    const failures = []
+
     try {
-      // Upload image to S3
+      // Upload all files in a single multipart request
       const formData = new FormData()
-      formData.append('image', newImageFile)
+      newImages.forEach((img) => formData.append('files', img.file))
 
-      const uploadRes = await mediaAPI.uploadImage(formData)
-      const imageUrl = uploadRes.data.url
+      const uploadRes = await mediaAPI.uploadImages(formData)
+      const uploaded = uploadRes.data.files || []
 
-      // Add to gallery
-      await galleryAPI.create({
-        url: imageUrl,
-        caption: newImageCaption,
-        display_order: galleryImages.length,
-        is_active: 1
-      })
+      if (uploaded.length !== newImages.length) {
+        console.warn('Upload count mismatch', { sent: newImages.length, got: uploaded.length })
+      }
 
-      setShowAddModal(false)
-      setNewImageFile(null)
-      setNewImagePreview('')
-      setNewImageCaption('')
+      // Create one gallery entry per uploaded file (sequential to keep ordering)
+      const baseOrder = galleryImages.length
+      for (let i = 0; i < uploaded.length; i++) {
+        try {
+          await galleryAPI.create({
+            url: uploaded[i].url,
+            caption: newImages[i]?.caption || '',
+            display_order: baseOrder + i,
+            is_active: 1,
+          })
+          setUploadProgress((p) => ({ ...p, done: p.done + 1 }))
+        } catch (err) {
+          console.error('Gallery create error:', err)
+          failures.push(newImages[i]?.file?.name || `imagem ${i + 1}`)
+        }
+      }
+
+      resetAddModal()
       loadData()
+      if (failures.length > 0) {
+        alert(`Algumas imagens não foram salvas na galeria:\n- ${failures.join('\n- ')}`)
+      }
     } catch (error) {
       console.error('Upload error:', error)
-      alert('Erro ao fazer upload da imagem')
+      alert(`Erro ao fazer upload: ${error.response?.data?.message || error.message || 'desconhecido'}`)
     } finally {
       setUploading(false)
     }
@@ -350,112 +406,131 @@ const GalleryManager = () => {
           </div>
         )}
 
-      {/* Add Image Modal */}
+      {/* Add Images Modal (multi-upload) */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full">
+          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-xl font-bold text-gray-900">Adicionar Imagem à Galeria</h2>
+              <h2 className="text-xl font-bold text-gray-900">
+                Adicionar Imagens à Galeria
+                {newImages.length > 0 && (
+                  <span className="ml-2 text-sm font-medium text-gray-500">
+                    ({newImages.length} {newImages.length === 1 ? 'selecionada' : 'selecionadas'})
+                  </span>
+                )}
+              </h2>
               <button
-                onClick={() => {
-                  setShowAddModal(false)
-                  setNewImageFile(null)
-                  setNewImagePreview('')
-                  setNewImageCaption('')
-                }}
+                onClick={resetAddModal}
                 className="text-gray-500 hover:text-gray-700"
+                disabled={uploading}
               >
                 <XMarkIcon className="w-6 h-6" />
               </button>
             </div>
 
-            {/* Content */}
-            <div className="p-6">
+            {/* Content (scrollable) */}
+            <div className="p-6 overflow-y-auto flex-1">
               {/* Upload Area */}
               <div
-                className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all ${
+                className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all cursor-pointer ${
                   dragActive
                     ? 'border-primary-500 bg-primary-50'
-                    : newImagePreview
-                    ? 'border-green-500 bg-green-50'
                     : 'border-gray-300 hover:border-primary-400'
                 }`}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
                 onDragOver={handleDrag}
                 onDrop={(e) => handleDrop(e, false)}
+                onClick={() => fileInputRef.current?.click()}
               >
                 <input
                   ref={fileInputRef}
                   type="file"
+                  multiple
                   accept="image/jpeg,image/png,image/webp"
-                  onChange={(e) => handleFileSelect(e.target.files[0], false)}
+                  onChange={(e) => {
+                    addFiles(e.target.files)
+                    e.target.value = ''
+                  }}
                   className="hidden"
                 />
+                <CloudArrowUpIcon className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                <p className="text-gray-600 font-medium mb-1">
+                  Arraste imagens ou clique para selecionar
+                </p>
+                <p className="text-gray-400 text-sm">
+                  JPG, PNG, WEBP — até 5MB cada. Você pode selecionar várias de uma vez.
+                </p>
+              </div>
 
-                {newImagePreview ? (
-                  <div className="space-y-4">
-                    <img
-                      src={newImagePreview}
-                      alt="Preview"
-                      className="w-full h-48 object-cover rounded-lg mx-auto"
+              {/* Selected images grid */}
+              {newImages.length > 0 && (
+                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {newImages.map((img) => (
+                    <div key={img.id} className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+                      <div className="relative">
+                        <img
+                          src={img.preview}
+                          alt={img.file.name}
+                          className="w-full h-32 object-cover"
+                        />
+                        <button
+                          onClick={() => removeNewImage(img.id)}
+                          disabled={uploading}
+                          aria-label="Remover desta seleção"
+                          className="absolute top-1 right-1 w-7 h-7 flex items-center justify-center rounded-full bg-black/60 hover:bg-red-600 text-white transition-colors disabled:opacity-50"
+                        >
+                          <XMarkIcon className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="p-2">
+                        <p className="text-xs text-gray-500 truncate mb-1" title={img.file.name}>
+                          {img.file.name} · {(img.file.size / 1024).toFixed(0)} KB
+                        </p>
+                        <input
+                          type="text"
+                          value={img.caption}
+                          onChange={(e) => updateNewImageCaption(img.id, e.target.value)}
+                          placeholder="Legenda (opcional)"
+                          disabled={uploading}
+                          className="w-full text-sm px-2 py-1 border border-gray-200 rounded focus:outline-none focus:border-primary-400"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Progress bar */}
+              {uploading && uploadProgress.total > 0 && (
+                <div className="mt-6">
+                  <div className="flex justify-between text-sm text-gray-600 mb-1">
+                    <span>Salvando na galeria...</span>
+                    <span>{uploadProgress.done} / {uploadProgress.total}</span>
+                  </div>
+                  <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary-500 transition-all"
+                      style={{ width: `${(uploadProgress.done / uploadProgress.total) * 100}%` }}
                     />
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      className="text-primary-600 hover:text-primary-700 font-medium"
-                    >
-                      Trocar imagem
-                    </button>
                   </div>
-                ) : (
-                  <div
-                    className="cursor-pointer"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <CloudArrowUpIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 font-medium mb-1">
-                      Arraste uma imagem ou clique para selecionar
-                    </p>
-                    <p className="text-gray-400 text-sm">
-                      JPG, PNG, WEBP (máx. 5MB)
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Caption Input */}
-              <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Legenda (opcional)
-                </label>
-                <input
-                  type="text"
-                  value={newImageCaption}
-                  onChange={(e) => setNewImageCaption(e.target.value)}
-                  placeholder="Descrição da imagem"
-                  className="input-field w-full"
-                />
-              </div>
+                </div>
+              )}
             </div>
 
             {/* Footer */}
             <div className="flex justify-end gap-3 p-6 border-t">
               <button
-                onClick={() => {
-                  setShowAddModal(false)
-                  setNewImageFile(null)
-                  setNewImagePreview('')
-                  setNewImageCaption('')
-                }}
+                onClick={resetAddModal}
                 className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                 disabled={uploading}
               >
                 Cancelar
               </button>
               <button
-                onClick={handleAddImage}
-                disabled={!newImageFile || uploading}
+                onClick={handleAddImages}
+                disabled={newImages.length === 0 || uploading}
                 className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {uploading ? (
@@ -464,7 +539,7 @@ const GalleryManager = () => {
                     Enviando...
                   </>
                 ) : (
-                  'Adicionar'
+                  `Adicionar ${newImages.length || ''} ${newImages.length === 1 ? 'imagem' : 'imagens'}`.trim()
                 )}
               </button>
             </div>
@@ -505,7 +580,7 @@ const GalleryManager = () => {
                   ref={editFileInputRef}
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
-                  onChange={(e) => handleFileSelect(e.target.files[0], true)}
+                  onChange={(e) => handleEditFileSelect(e.target.files[0])}
                   className="hidden"
                 />
 

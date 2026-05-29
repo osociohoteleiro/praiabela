@@ -64,7 +64,7 @@ const Login = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="input-field"
-                placeholder="admin@praiabela.com"
+                placeholder="seu@email.com"
                 autoComplete="email"
               />
             </div>
@@ -97,13 +97,6 @@ const Login = () => {
               )}
             </button>
           </form>
-
-          <div className="mt-6 text-center text-sm text-gray-500">
-            <p>Credenciais padrão:</p>
-            <p className="font-mono text-xs mt-1">
-              admin@praiabela.com / admin123
-            </p>
-          </div>
         </div>
 
         {/* Back to Site */}

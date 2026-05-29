@@ -39,6 +39,6 @@ export async function onRequestPost({ request, env }) {
     })
   } catch (err) {
     console.error('Multiple images upload error:', err)
-    return serverError('Erro ao fazer upload das imagens')
+    return serverError(`Erro ao fazer upload das imagens: ${err.message || err.name || 'desconhecido'}`)
   }
 }

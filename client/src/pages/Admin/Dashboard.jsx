@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { promotionsAPI, packagesAPI } from '../../services/api'
+import { packagesAPI } from '../../services/api'
 import {
-  TagIcon,
   CubeIcon,
   ChartBarIcon,
 } from '@heroicons/react/24/outline'
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
-    promotions: 0,
     packages: 0,
   })
   const [loading, setLoading] = useState(true)
@@ -20,13 +18,8 @@ const Dashboard = () => {
 
   const loadStats = async () => {
     try {
-      const [promotionsRes, packagesRes] = await Promise.all([
-        promotionsAPI.getAll(),
-        packagesAPI.getAll(),
-      ])
-
+      const packagesRes = await packagesAPI.getAll()
       setStats({
-        promotions: promotionsRes.data.length,
         packages: packagesRes.data.length,
       })
     } catch (error) {
@@ -37,13 +30,6 @@ const Dashboard = () => {
   }
 
   const statCards = [
-    {
-      name: 'Promoções Ativas',
-      value: stats.promotions,
-      icon: TagIcon,
-      color: 'bg-primary-500',
-      link: '/admin/promotions',
-    },
     {
       name: 'Pacotes',
       value: stats.packages,
@@ -100,14 +86,6 @@ const Dashboard = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Link
-              to="/admin/promotions"
-              className="p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-all"
-            >
-              <h3 className="font-semibold text-gray-900 mb-1">Nova Promoção</h3>
-              <p className="text-sm text-gray-600">Criar uma nova promoção para o site</p>
-            </Link>
-
             <Link
               to="/admin/packages"
               className="p-4 border-2 border-gray-200 rounded-lg hover:border-secondary-500 hover:bg-secondary-50 transition-all"

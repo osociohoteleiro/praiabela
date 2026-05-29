@@ -29,7 +29,7 @@ writeFileSync(tmpPath, sql)
 
 try {
   execSync(
-    `npx wrangler d1 execute praiabela-db ${target} --file="${tmpPath}"`,
+    `echo y | npx wrangler d1 execute praiabela-db ${target} --file="${tmpPath}"`,
     { stdio: 'inherit', shell: true }
   )
   console.log(`\n✅ Admin "${email}" set (target: ${target}).`)

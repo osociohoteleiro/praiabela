@@ -32,24 +32,26 @@ export async function onRequestPost({ request, env }) {
     return badRequest('JSON inválido')
   }
 
-  const { name, description, price, inclusions, image_urls, is_featured, is_active } = body || {}
-  if (!name || !description || price == null || !inclusions) {
+  const { name, description, price, inclusions, image_urls, is_featured, is_active, start_date, end_date } = body || {}
+  if (!name || !description || !inclusions) {
     return badRequest('Campos obrigatórios faltando')
   }
 
   try {
     const result = await env.DB.prepare(`
-      INSERT INTO packages (name, description, price, inclusions, image_urls, is_featured, is_active)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO packages (name, description, price, inclusions, image_urls, is_featured, is_active, start_date, end_date)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       RETURNING *
     `).bind(
       name,
       description,
-      price,
+      Number(price) || 0,
       JSON.stringify(inclusions),
       JSON.stringify(image_urls || []),
       is_featured ? 1 : 0,
-      is_active !== undefined ? (is_active ? 1 : 0) : 1
+      is_active !== undefined ? (is_active ? 1 : 0) : 1,
+      start_date || null,
+      end_date || null
     ).first()
 
     return json(parsePackage(result), { status: 201 })

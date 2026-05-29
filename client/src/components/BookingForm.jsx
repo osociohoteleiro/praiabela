@@ -167,7 +167,7 @@ const BookingForm = () => {
                 onChange={(date) => {
                   setCheckIn(date)
                   setError(null)
-                  setTimeout(() => checkOutRef.current?.setFocus(), 100)
+                  setTimeout(() => checkOutRef.current?.setOpen(true), 100)
                 }}
                 selectsStart
                 startDate={checkIn}
@@ -265,7 +265,7 @@ const BookingForm = () => {
               onChange={(date) => {
                 setCheckIn(date)
                 setError(null)
-                setTimeout(() => checkOutRef.current?.setFocus(), 100)
+                setTimeout(() => checkOutRef.current?.setOpen(true), 100)
               }}
               selectsStart
               startDate={checkIn}
@@ -377,7 +377,7 @@ const BookingForm = () => {
           onChange={(date) => {
             setCheckIn(date)
             setError(null)
-            setTimeout(() => checkOutRef.current?.setFocus(), 100)
+            setTimeout(() => checkOutRef.current?.setOpen(true), 100)
           }}
           selectsStart
           startDate={checkIn}
@@ -519,7 +519,7 @@ const BookingForm = () => {
 
         {!isSticky && (
           <p className="text-center text-sm text-gray-500 mt-4">
-            Ou ligue para <a href="tel:+5573986644644" className="text-primary-500 font-semibold hover:underline">(73) 98664-4644</a>
+            Ou ligue para <a href="tel:+557398664644" className="text-primary-500 font-semibold hover:underline">(73) 9866-4644</a>
           </p>
         )}
       </div>

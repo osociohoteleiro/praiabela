@@ -182,7 +182,7 @@ const Rooms = () => {
   const loadRooms = async () => {
     try {
       const { data } = await roomsAPI.getAll()
-      setRooms(data)
+      setRooms(Array.isArray(data) ? data : [])
     } catch (error) {
       console.error('Error loading rooms:', error)
     } finally {

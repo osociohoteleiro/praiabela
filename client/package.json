@@ -16,10 +16,9 @@
     "deploy": "vite build && wrangler pages deploy ./dist"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.658.1",
-    "@aws-sdk/lib-storage": "^3.658.1",
     "@heroicons/react": "^2.1.1",
     "@tsndr/cloudflare-worker-jwt": "^3.1.4",
+    "aws4fetch": "^1.0.20",
     "axios": "^1.6.7",
     "bcryptjs": "^2.4.3",
     "date-fns": "^3.3.1",
