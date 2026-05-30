@@ -6,7 +6,6 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isTourActive, setIsTourActive] = useState(false)
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const isHome = location.pathname === '/'
@@ -20,18 +19,11 @@ const Navbar = () => {
       setIsTourActive(e.detail)
     }
 
-    const handleOpenBookingModal = () => setIsBookingModalOpen(true)
-    const handleCloseBookingModal = () => setIsBookingModalOpen(false)
-
     window.addEventListener('scroll', handleScroll)
     window.addEventListener('tourInteraction', handleTourInteraction)
-    window.addEventListener('openBookingModal', handleOpenBookingModal)
-    window.addEventListener('closeBookingModal', handleCloseBookingModal)
     return () => {
       window.removeEventListener('scroll', handleScroll)
       window.removeEventListener('tourInteraction', handleTourInteraction)
-      window.removeEventListener('openBookingModal', handleOpenBookingModal)
-      window.removeEventListener('closeBookingModal', handleCloseBookingModal)
     }
   }, [])
 
@@ -45,12 +37,7 @@ const Navbar = () => {
     { name: 'Contato', href: '#contact' },
   ]
 
-  const closeBookingModal = () => {
-    window.dispatchEvent(new CustomEvent('closeBookingModal'))
-  }
-
   const scrollToSection = (href) => {
-    closeBookingModal()
     if (!isHome) {
       navigate('/', { state: { scrollTo: href } })
       setIsMobileMenuOpen(false)
@@ -64,7 +51,6 @@ const Navbar = () => {
   }
 
   const handleNavClick = (link) => {
-    closeBookingModal()
     if (link.route) {
       navigate(link.href)
       setIsMobileMenuOpen(false)
@@ -74,7 +60,11 @@ const Navbar = () => {
   }
 
   const openBookingModal = () => {
-    window.dispatchEvent(new CustomEvent('openBookingModal'))
+    window.open(
+      'https://book.omnibees.com/hotelresults?q=4071&NRooms=1&lang=pt&currencyId=BRL',
+      '_blank',
+      'noopener,noreferrer',
+    )
     setIsMobileMenuOpen(false)
   }
 
@@ -83,7 +73,7 @@ const Navbar = () => {
       {/* Top Navbar - visible when not scrolled */}
       <nav
         className={`absolute top-0 right-0 transition-all duration-300 ${
-          isTourActive || isBookingModalOpen
+          isTourActive
             ? 'z-0 opacity-0 pointer-events-none'
             : 'z-50'
         } ${
@@ -176,7 +166,6 @@ const Navbar = () => {
             {/* Home button */}
             <button
               onClick={() => {
-                closeBookingModal()
                 window.scrollTo({ top: 0, behavior: 'smooth' })
               }}
               className="p-3 rounded-xl text-primary-500 hover:bg-primary-50 transition-colors group relative"
@@ -226,7 +215,7 @@ const Navbar = () => {
       {/* Mobile Bottom Bar - fixed when scrolled */}
       <nav
         className={`fixed bottom-0 left-0 right-0 lg:hidden transition-all duration-300 ${
-          isTourActive || isBookingModalOpen
+          isTourActive
             ? 'z-0 opacity-0 pointer-events-none translate-y-full'
             : 'z-50'
         } ${
@@ -239,7 +228,6 @@ const Navbar = () => {
           <div className="flex items-center justify-around">
             <button
               onClick={() => {
-                closeBookingModal()
                 window.scrollTo({ top: 0, behavior: 'smooth' })
               }}
               className="flex flex-col items-center p-2 text-gray-600 hover:text-primary-500 transition-colors"

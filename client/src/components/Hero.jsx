@@ -1,27 +1,12 @@
-import { useState, useEffect } from 'react'
-
 const heroImageUrl = '/hero.jpg'
 
 const Hero = () => {
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
-
   const scrollToBooking = () => {
     const bookingSection = document.getElementById('booking-form')
     if (bookingSection) {
       bookingSection.scrollIntoView({ behavior: 'smooth' })
     }
   }
-
-  useEffect(() => {
-    const handleOpenBookingModal = () => setIsBookingModalOpen(true)
-    const handleCloseBookingModal = () => setIsBookingModalOpen(false)
-    window.addEventListener('openBookingModal', handleOpenBookingModal)
-    window.addEventListener('closeBookingModal', handleCloseBookingModal)
-    return () => {
-      window.removeEventListener('openBookingModal', handleOpenBookingModal)
-      window.removeEventListener('closeBookingModal', handleCloseBookingModal)
-    }
-  }, [])
 
   return (
     <div className="relative h-screen w-full overflow-hidden">
