@@ -65,11 +65,11 @@ const BookingForm = () => {
     return () => window.removeEventListener('highlightBookingForm', handleHighlight)
   }, [])
 
-  // Listener para abrir modal direto (sem parâmetros)
+  // Listener para abrir modal (URL opcional via event.detail.url)
   useEffect(() => {
-    const handleOpenBookingModal = () => {
-      const baseUrl = 'https://book.omnibees.com/hotelresults?q=4071&NRooms=1&lang=pt&currencyId=BRL'
-      setBookingUrl(baseUrl)
+    const handleOpenBookingModal = (e) => {
+      const url = e?.detail?.url || 'https://book.omnibees.com/hotelresults?q=4071&NRooms=1&lang=pt&currencyId=BRL'
+      setBookingUrl(url)
       setIsLoadingBooking(true)
       setShowBookingModal(true)
       document.body.style.overflow = 'hidden'
@@ -138,18 +138,11 @@ const BookingForm = () => {
 
     const omnibeesUrl = `https://book.omnibees.com/hotelresults?q=4071&NRooms=1&CheckIn=${checkInFormatted}&CheckOut=${checkOutFormatted}&ad=${adults}&ch=${children}&ag=&group_code=&Code=&loyalty_code=&lang=pt&currencyId=BRL`
 
-    // Abrir modal com iframe ao invés de nova aba
-    setBookingUrl(omnibeesUrl)
-    setIsLoadingBooking(true)
-    setShowBookingModal(true)
-    document.body.style.overflow = 'hidden'
+    window.dispatchEvent(new CustomEvent('openBookingModal', { detail: { url: omnibeesUrl } }))
   }
 
   const closeBookingModal = () => {
-    setShowBookingModal(false)
-    setBookingUrl('')
-    setIsLoadingBooking(false)
-    document.body.style.overflow = ''
+    window.dispatchEvent(new CustomEvent('closeBookingModal'))
   }
 
   // Cleanup on unmount
