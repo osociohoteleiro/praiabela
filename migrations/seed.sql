@@ -159,6 +159,26 @@ INSERT OR REPLACE INTO settings (key, value) VALUES
 ('promotionsSection', json('{ "eyebrow": "APROVEITE", "title": "PROMOÇÕES" }')),
 ('blogSection', json('{ "eyebrow": "DIÁRIO DA POUSADA", "title": "NOSSO BLOG" }'));
 
+-- ---------- Tema / paleta de cores (editável na aba "Aparência" do admin) ----------
+INSERT OR REPLACE INTO settings (key, value) VALUES
+('theme', json('{
+  "brand": "#2f8f63",
+  "brandDark": "#246b4a",
+  "brandLight": "#e6f1ea",
+  "ink": "#1f3b30",
+  "eyebrow": "#2f8f63"
+}'));
+
+-- ---------- Tour Virtual 360° (editável na aba "Tour Virtual 360°" do admin) ----------
+INSERT OR REPLACE INTO settings (key, value) VALUES
+('tour', json('{
+  "enabled": true,
+  "eyebrow": "EXPLORE A POUSADA",
+  "title": "Tour Virtual 360°",
+  "subtitle": "Passeie pela Pousada Praia Bela como se estivesse aqui. Arraste para girar e explore cada ambiente.",
+  "url": "https://tourmkr.com/F1biwwjN1X/46253449p&346.86h&78.42t&autorotate=true"
+}'));
+
 -- ---------- Experiences ----------
 DELETE FROM experiences;
 INSERT INTO experiences (title, description, image_url, sort_order) VALUES

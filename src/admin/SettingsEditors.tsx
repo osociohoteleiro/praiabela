@@ -10,7 +10,10 @@ import type {
   PromoSettings,
   ContactSettings,
   SectionTitle,
+  ThemeSettings,
+  TourSettings,
 } from "../lib/types";
+import { DEFAULT_THEME } from "../site/ThemeStyle";
 
 function useSetting<T extends object>(key: string, initial: T) {
   const [value, setValue] = useState<T>(initial);
@@ -168,6 +171,125 @@ export function ContactEditor({ initial }: { initial: ContactSettings }) {
       <div className="mt-4">
         <Field label="Texto institucional"><Textarea value={s.value.groupText} onChange={(e) => s.set({ groupText: e.target.value })} /></Field>
       </div>
+      <SaveBar {...s} onSave={s.save} />
+    </Card>
+  );
+}
+
+/** Campo de cor: seletor nativo + entrada hexadecimal sincronizados. */
+function ColorField({
+  label,
+  hint,
+  value,
+  onChange,
+}: {
+  label: string;
+  hint?: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <Field label={label} hint={hint}>
+      <div className="flex items-center gap-2">
+        <input
+          type="color"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-9 w-12 shrink-0 cursor-pointer rounded border border-gray-300 bg-white p-0.5"
+          aria-label={`${label} (seletor)`}
+        />
+        <Input value={value} onChange={(e) => onChange(e.target.value)} className="font-mono uppercase" />
+      </div>
+    </Field>
+  );
+}
+
+export function ThemeEditor({ initial }: { initial: ThemeSettings }) {
+  const s = useSetting<ThemeSettings>("theme", initial);
+  const v = s.value;
+  return (
+    <Card title="Cores do site">
+      <p className="mb-4 text-sm text-gray-500">
+        Personalize a paleta do site. As alterações aparecem no site público depois de salvar.
+      </p>
+      <div className="grid gap-4 md:grid-cols-2">
+        <ColorField label="Cor principal" hint="Botões, links e destaques" value={v.brand} onChange={(brand) => s.set({ brand })} />
+        <ColorField label="Cor principal — hover (mais escura)" value={v.brandDark} onChange={(brandDark) => s.set({ brandDark })} />
+        <ColorField label="Fundo claro" hint="Seções com fundo suave" value={v.brandLight} onChange={(brandLight) => s.set({ brandLight })} />
+        <ColorField label="Cor dos títulos" value={v.ink} onChange={(ink) => s.set({ ink })} />
+        <ColorField label="Cor dos eyebrows" hint="Texto pequeno acima dos títulos" value={v.eyebrow} onChange={(eyebrow) => s.set({ eyebrow })} />
+      </div>
+
+      <div className="mt-5 rounded-lg border border-gray-200 p-5" style={{ background: v.brandLight }}>
+        <p className="text-xs font-medium uppercase tracking-[0.18em]" style={{ color: v.eyebrow }}>
+          Pré-visualização
+        </p>
+        <h4 className="font-display text-2xl" style={{ color: v.ink }}>
+          Pousada Praia Bela
+        </h4>
+        <button
+          type="button"
+          className="mt-3 rounded-md px-4 py-2 text-sm font-medium uppercase tracking-wider text-white"
+          style={{ background: v.brand }}
+        >
+          Faça uma reserva
+        </button>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => s.set({ ...DEFAULT_THEME })}
+        className="mt-3 text-sm text-gray-500 underline-offset-2 hover:underline"
+      >
+        Restaurar cores padrão
+      </button>
+
+      <SaveBar {...s} onSave={s.save} />
+    </Card>
+  );
+}
+
+export function TourEditor({ initial }: { initial: TourSettings }) {
+  const s = useSetting<TourSettings>("tour", initial);
+  return (
+    <Card title="Tour Virtual 360°">
+      <p className="mb-4 text-sm text-gray-500">
+        Tour 360° embutido (TourMaker, Matterport, Kuula, etc.). Cole a URL de incorporação (embed) do tour.
+      </p>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Field label="Exibir no site">
+          <Select value={String(s.value.enabled)} onChange={(e) => s.set({ enabled: e.target.value === "true" })}>
+            <option value="true">Sim</option>
+            <option value="false">Não</option>
+          </Select>
+        </Field>
+        <Field label="Eyebrow (texto pequeno acima)"><Input value={s.value.eyebrow} onChange={(e) => s.set({ eyebrow: e.target.value })} /></Field>
+        <Field label="Título"><Input value={s.value.title} onChange={(e) => s.set({ title: e.target.value })} /></Field>
+        <div className="md:col-span-2">
+          <Field label="Subtítulo"><Textarea value={s.value.subtitle} onChange={(e) => s.set({ subtitle: e.target.value })} rows={2} /></Field>
+        </div>
+        <div className="md:col-span-2">
+          <Field label="URL do tour (embed)" hint="Ex.: https://tourmkr.com/F1biwwjN1X/46253449p&346.86h&78.42t&autorotate=true">
+            <Input value={s.value.url} onChange={(e) => s.set({ url: e.target.value })} />
+          </Field>
+        </div>
+      </div>
+
+      {s.value.enabled && s.value.url && (
+        <div className="mt-5">
+          <p className="mb-2 text-sm font-medium text-gray-700">Pré-visualização</p>
+          <div className="aspect-video w-full overflow-hidden rounded-lg border border-gray-200 bg-black">
+            <iframe
+              src={s.value.url}
+              title="Pré-visualização do tour"
+              className="h-full w-full border-0"
+              allow="accelerometer; gyroscope; magnetometer; vr; xr; fullscreen"
+              allowFullScreen
+            />
+          </div>
+        </div>
+      )}
+
       <SaveBar {...s} onSave={s.save} />
     </Card>
   );

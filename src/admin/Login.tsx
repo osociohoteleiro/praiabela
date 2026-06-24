@@ -24,7 +24,7 @@ export default function Login({ onSuccess }: { onSuccess: () => void }) {
   return (
     <div className="grid min-h-screen place-items-center bg-gradient-to-br from-brand-dark to-brand px-5">
       <form onSubmit={submit} className="w-full max-w-sm rounded-xl bg-white p-8 shadow-2xl">
-        <h1 className="font-display text-2xl tracking-wide text-ink">Painel Loft</h1>
+        <h1 className="font-display text-2xl tracking-wide text-ink">Painel Praia Bela</h1>
         <p className="mb-6 mt-1 text-sm text-gray-500">Entre com a senha de administrador.</p>
 
         <Input

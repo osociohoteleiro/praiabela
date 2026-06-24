@@ -14,6 +14,8 @@ import Promo from "./Promo";
 import BlogTeaser from "./BlogTeaser";
 import Testimonials from "./Testimonials";
 import Footer from "./Footer";
+import ThemeStyle from "./ThemeStyle";
+import VirtualTour from "./VirtualTour";
 
 export default function SitePage() {
   const [content, setContent] = useState<SiteContent | null>(null);
@@ -52,6 +54,7 @@ export default function SitePage() {
 
   return (
     <div className="bg-white">
+      <ThemeStyle theme={settings.theme} />
       <Header general={settings.general} contact={settings.contact} />
       <Hero hero={settings.hero} />
       <About about={settings.about} />
@@ -62,6 +65,7 @@ export default function SitePage() {
         amenitiesSection={settings.amenitiesSection}
       />
       <Rooms rooms={rooms} section={settings.roomsSection} />
+      <VirtualTour tour={settings.tour} />
       <Experiences experiences={experiences} section={settings.experiencesSection} />
       <Packages packages={packages} section={settings.packagesSection} />
       <Promotions promotions={promotions} section={settings.promotionsSection} />

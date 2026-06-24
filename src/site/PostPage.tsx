@@ -5,6 +5,7 @@ import type { SiteContent } from "../lib/types";
 import Header from "./Header";
 import Footer from "./Footer";
 import { formatPostDate } from "./PostCard";
+import ThemeStyle from "./ThemeStyle";
 
 export default function PostPage() {
   const { slug } = useParams();
@@ -38,6 +39,7 @@ export default function PostPage() {
 
   return (
     <div className="bg-white">
+      <ThemeStyle theme={settings.theme} />
       <Header general={settings.general} contact={settings.contact} />
 
       <main className="mx-auto max-w-3xl px-5 pb-20 pt-32">

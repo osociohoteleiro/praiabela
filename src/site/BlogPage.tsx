@@ -5,6 +5,7 @@ import type { SiteContent } from "../lib/types";
 import Header from "./Header";
 import Footer from "./Footer";
 import PostCard from "./PostCard";
+import ThemeStyle from "./ThemeStyle";
 
 export default function BlogPage() {
   const [content, setContent] = useState<SiteContent | null>(null);
@@ -36,6 +37,7 @@ export default function BlogPage() {
 
   return (
     <div className="bg-white">
+      <ThemeStyle theme={settings.theme} />
       <Header general={settings.general} contact={settings.contact} />
 
       <main className="mx-auto max-w-7xl px-5 pb-20 pt-32">

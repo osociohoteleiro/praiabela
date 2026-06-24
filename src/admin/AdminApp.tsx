@@ -11,13 +11,18 @@ import {
   PromoEditor,
   ContactEditor,
   SectionTitleEditor,
+  ThemeEditor,
+  TourEditor,
 } from "./SettingsEditors";
+import { resolveTheme } from "../site/ThemeStyle";
 
 const NAV = [
   { id: "geral", label: "Geral" },
+  { id: "aparencia", label: "Aparência (cores)" },
   { id: "hero", label: "Hero" },
   { id: "sobre", label: "Sobre" },
   { id: "acomodacoes", label: "Acomodações" },
+  { id: "tour", label: "Tour Virtual 360°" },
   { id: "experiencias", label: "Experiências" },
   { id: "pacotes", label: "Pacotes" },
   { id: "promocoes", label: "Promoções" },
@@ -191,6 +196,7 @@ export default function AdminApp() {
               <SectionTitleEditor settingKey="gallerySection" title="Título — Galeria" initial={s.gallerySection} />
             </>
           )}
+          {tab === "aparencia" && <ThemeEditor initial={resolveTheme(s.theme)} />}
           {tab === "hero" && <HeroEditor initial={s.hero} />}
           {tab === "sobre" && <AboutEditor initial={s.about} />}
           {tab === "acomodacoes" && (
@@ -199,6 +205,19 @@ export default function AdminApp() {
               title="Acomodações"
               fields={ROOM_FIELDS}
               defaults={{ title: "Nova acomodação", subtitle: "", description: "", image_url: "", amenities: [], sort_order: 99 }}
+            />
+          )}
+          {tab === "tour" && (
+            <TourEditor
+              initial={
+                s.tour ?? {
+                  enabled: true,
+                  eyebrow: "EXPLORE A POUSADA",
+                  title: "Tour Virtual 360°",
+                  subtitle: "Passeie pela Pousada Praia Bela como se estivesse aqui. Arraste para girar e explore cada ambiente.",
+                  url: "",
+                }
+              }
             />
           )}
           {tab === "experiencias" && (

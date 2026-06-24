@@ -16,7 +16,7 @@ export default function Footer({
   contact: ContactSettings;
 }) {
   return (
-    <footer id="contato" className="bg-brand-dark text-white">
+    <footer id="contato" className="bg-ink text-white">
       <div className="mx-auto max-w-7xl px-5 py-16">
         <div className="grid gap-12 border-b border-white/15 pb-12 lg:grid-cols-2">
           <div>

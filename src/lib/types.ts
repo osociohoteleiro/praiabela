@@ -58,6 +58,22 @@ export interface SectionTitle {
   eyebrow?: string;
 }
 
+export interface ThemeSettings {
+  brand: string;
+  brandDark: string;
+  brandLight: string;
+  ink: string;
+  eyebrow: string;
+}
+
+export interface TourSettings {
+  enabled: boolean;
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  url: string;
+}
+
 export interface Room {
   id: number;
   title: string;
@@ -156,6 +172,8 @@ export interface SiteContent {
     packagesSection: SectionTitle;
     promotionsSection: SectionTitle;
     blogSection: SectionTitle;
+    theme?: ThemeSettings;
+    tour?: TourSettings;
   };
   rooms: Room[];
   highlights: Highlight[];

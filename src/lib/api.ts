@@ -1,6 +1,6 @@
 import type { SiteContent } from "./types";
 
-const TOKEN_KEY = "loft_admin_token";
+const TOKEN_KEY = "praia_bela_admin_token";
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
