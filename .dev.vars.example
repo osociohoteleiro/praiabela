@@ -1,0 +1,4 @@
+# Variáveis de desenvolvimento local (copie para .dev.vars e ajuste).
+# Em produção, defina como secrets: wrangler secret put <NOME>
+ADMIN_PASSWORD=admin123
+AUTH_SECRET=troque-por-um-valor-longo-e-aleatorio

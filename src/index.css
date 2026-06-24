@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Cinzel", Georgia, serif;
+  --font-sans: "Jost", ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand: #2f8f63;
+  --color-brand-dark: #246b4a;
+  --color-brand-light: #e6f1ea;
+  --color-ink: #1f3b30;
+  --color-eyebrow: #2f8f63;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: #2d2d2d;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+}
+
+/* Títulos de seção com letras espaçadas, estilo do site de referência */
+.section-title {
+  font-family: var(--font-display);
+  letter-spacing: 0.06em;
+  color: var(--color-ink);
+}
+
+.eyebrow {
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-eyebrow);
+}
+
+.btn-brand {
+  background: var(--color-brand);
+  color: #fff;
+  letter-spacing: 0.08em;
+  transition: background-color 0.2s ease;
+}
+.btn-brand:hover {
+  background: var(--color-brand-dark);
+}
+
+/* Barra de reserva: ao clicar em "FAÇA UMA RESERVA" (#reservar) a barra rola
+   para baixo do header fixo, sobe para a frente e ganha um destaque animado. */
+.booking-anchor {
+  scroll-margin-top: 7rem; /* não deixa o header fixo cobrir a barra */
+}
+.booking-anchor:target {
+  z-index: 50; /* acima do header (z-40) */
+}
+.booking-card.booking-highlight-active {
+  animation: booking-highlight 1.8s ease-out;
+}
+@keyframes booking-highlight {
+  0% {
+    box-shadow: 0 0 0 0 rgba(47, 143, 99, 0);
+  }
+  15% {
+    box-shadow: 0 0 0 6px rgba(47, 143, 99, 0.55), 0 20px 45px rgba(0, 0, 0, 0.25);
+  }
+  60% {
+    box-shadow: 0 0 0 4px rgba(47, 143, 99, 0.35), 0 16px 38px rgba(0, 0, 0, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(47, 143, 99, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .booking-card.booking-highlight-active {
+    animation: none;
+    box-shadow: 0 0 0 4px rgba(47, 143, 99, 0.45);
+  }
+}
+
+.scrollbar-thin::-webkit-scrollbar { height: 6px; width: 6px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5cb; border-radius: 9999px; }
+
+/* Esconde a barra de rolagem (carrossel controlado pelos botões ‹ ›) */
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }

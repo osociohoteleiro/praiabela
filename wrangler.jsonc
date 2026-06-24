@@ -1,0 +1,32 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "praiabela",
+  "main": "./worker/index.ts",
+  "compatibility_date": "2025-05-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
+  "observability": {
+    "enabled": true
+  },
+  // Reutiliza o D1 existente da Praia Bela (mesmo instance id).
+  // O esquema é recriado no formato do site-loft via migrations/.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "praiabela-db",
+      "database_id": "168e85a7-1507-4f29-9873-1a83e37975ec",
+      "migrations_dir": "migrations"
+    }
+  ],
+  // Bucket R2 para uploads do admin. Criar com:
+  //   npx wrangler r2 bucket create praiabela-media
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "praiabela-media"
+    }
+  ]
+}

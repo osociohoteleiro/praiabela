@@ -1,306 +1,126 @@
-# 🏖️ Pousada Praia Bela
+# Pousada Praia Bela
 
-Site elegante e moderno para a Pousada Praia Bela em Ilhéus/BA, desenvolvido com React, Vite, Tailwind CSS e Node.js.
+Site institucional + painel administrativo da Pousada Praia Bela (Praia dos Milionários, Ilhéus/BA).
+Base de código portada do projeto **site-loft**, reaproveitando a infraestrutura existente da Praia Bela
+(banco D1 `praiabela-db` e armazenamento R2).
 
-## ✨ Características
-
-### Frontend
-- ⚛️ **React 18** com Vite para desenvolvimento rápido
-- 🎨 **Tailwind CSS** com tema customizado de cores quentes
-- 📱 **Totalmente responsivo** (mobile-first)
-- 🎬 **Hero section** com vídeo de fundo do S3
-- 📅 **Formulário de reserva** horizontal com date pickers
-- 🖼️ **Galeria de fotos** com lightbox
-- ✨ **Animações suaves** e efeitos visuais
-- 🚀 **Performance otimizada** com lazy loading e code splitting
-
-### Backend
-- 🟢 **Node.js** com Express
-- 🗄️ **SQLite** para banco de dados leve
-- 🔐 **Autenticação JWT** para painel admin
-- ☁️ **AWS S3** para armazenamento de mídia
-- 🔒 **Segurança** com Helmet, CORS e rate limiting
-
-### Painel Administrativo
-- 📊 Dashboard com estatísticas
-- 🏷️ CRUD completo de promoções
-- 📦 CRUD completo de pacotes
-- ℹ️ Editor de informações do site
-- 📤 Gerenciador de mídia S3 (upload de imagens e vídeos)
-- 🔐 Sistema de autenticação seguro
-
-## 🚀 Instalação
-
-### Pré-requisitos
-- Node.js 18+ instalado
-- Conta AWS com acesso ao S3
-
-### Passo 1: Clonar/Baixar o projeto
-
-```bash
-cd site-praiabela
-```
-
-### Passo 2: Instalar dependências
-
-```bash
-# Instalar todas as dependências (root, client e server)
-npm run install:all
-```
-
-Ou instalar manualmente:
-
-```bash
-# Instalar dependências do cliente
-cd client
-npm install
-
-# Instalar dependências do servidor
-cd ../server
-npm install
-```
-
-### Passo 3: Configurar variáveis de ambiente
-
-O arquivo `.env` já está configurado em `server/.env` com as credenciais AWS fornecidas. Verifique e ajuste se necessário:
-
-```env
-# Server Configuration
-PORT=5000
-NODE_ENV=development
-
-# JWT Secret (ALTERE EM PRODUÇÃO!)
-JWT_SECRET=sua_chave_secreta_super_segura_mude_em_producao_12345
-
-# AWS S3 Configuration
-AWS_ACCESS_KEY_ID=sua_access_key_aqui
-AWS_SECRET_ACCESS_KEY=sua_secret_key_aqui
-AWS_REGION=us-east-2
-AWS_BUCKET_NAME=seu_bucket_aqui
-AWS_S3_ENDPOINT=https://s3.us-east-2.amazonaws.com
-
-# Admin Default Credentials
-ADMIN_EMAIL=admin@praiabela.com
-ADMIN_PASSWORD=admin123
-```
-
-### Passo 4: Iniciar o projeto
-
-#### Desenvolvimento (ambos os servidores simultaneamente)
-
-```bash
-# Na raiz do projeto
-npm run dev
-```
-
-Isso iniciará:
-- Frontend em http://localhost:3000
-- Backend em http://localhost:5000
-
-#### Ou iniciar separadamente
-
-```bash
-# Terminal 1 - Backend
-cd server
-npm run dev
-
-# Terminal 2 - Frontend
-cd client
-npm run dev
-```
-
-## 📁 Estrutura do Projeto
-
-```
-site-praiabela/
-├── client/                      # Frontend React
-│   ├── public/
-│   ├── src/
-│   │   ├── components/          # Componentes públicos e admin
-│   │   │   ├── Hero.jsx
-│   │   │   ├── BookingForm.jsx
-│   │   │   ├── Navbar.jsx
-│   │   │   ├── About.jsx
-│   │   │   ├── Rooms.jsx
-│   │   │   ├── Packages.jsx
-│   │   │   ├── Gallery.jsx
-│   │   │   ├── Contact.jsx
-│   │   │   ├── Footer.jsx
-│   │   │   ├── AdminLayout.jsx
-│   │   │   └── ProtectedRoute.jsx
-│   │   ├── pages/
-│   │   │   ├── Home.jsx
-│   │   │   └── Admin/
-│   │   │       ├── Login.jsx
-│   │   │       ├── Dashboard.jsx
-│   │   │       ├── Promotions.jsx
-│   │   │       ├── Packages.jsx
-│   │   │       ├── SiteInfo.jsx
-│   │   │       └── MediaManager.jsx
-│   │   ├── services/
-│   │   │   └── api.js           # Configuração Axios e endpoints
-│   │   ├── context/
-│   │   │   └── AdminContext.jsx
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   └── index.css            # Tailwind + estilos customizados
-│   ├── index.html
-│   ├── vite.config.js
-│   ├── tailwind.config.js       # Tema de cores quentes
-│   └── package.json
-├── server/                      # Backend Node.js
-│   ├── src/
-│   │   ├── config/
-│   │   │   ├── database.js      # SQLite setup
-│   │   │   └── s3.js            # AWS S3 config
-│   │   ├── routes/
-│   │   │   ├── auth.js
-│   │   │   ├── promotions.js
-│   │   │   ├── packages.js
-│   │   │   ├── siteInfo.js
-│   │   │   ├── upload.js
-│   │   │   └── media.js
-│   │   ├── middleware/
-│   │   │   ├── auth.js
-│   │   │   └── upload.js
-│   │   └── server.js
-│   ├── database/
-│   │   └── praiabela.db         # SQLite database (criado automaticamente)
-│   ├── .env
-│   └── package.json
-└── package.json                 # Root package.json
-```
-
-## 🔑 Acesso ao Painel Admin
-
-1. Acesse: http://localhost:3000/admin/login
-
-2. Credenciais padrão:
-   - **Email:** admin@praiabela.com
-   - **Senha:** admin123
-
-**⚠️ IMPORTANTE:** Altere as credenciais em produção!
-
-## 🎨 Paleta de Cores
-
-O site utiliza cores quentes inspiradas no litoral baiano:
-
-- **Primary (Laranja):** #f97316 - Representa o sol e o calor
-- **Secondary (Coral):** #f43f5e - Tons de pôr do sol
-- **Accent (Amarelo Dourado):** #fbbf24 - Areia e luz
-- **Ocean (Azul Turquesa):** #06b6d4 - Mar do nordeste
-
-## 📤 Upload de Mídia
-
-### Vídeo Hero
-1. Acesse o painel admin → **Mídia**
-2. Faça upload do vídeo (máx. 100MB, formato MP4/WebM)
-3. Copie a URL gerada
-4. Vá em **Info do Site** e cole a URL no campo "URL do Vídeo Hero"
-
-### Imagens
-1. Acesse **Mídia** no painel admin
-2. Arraste e solte imagens ou clique para selecionar
-3. As URLs podem ser copiadas e usadas em promoções, pacotes, etc.
-
-## 🏗️ Build para Produção
-
-```bash
-# Build do frontend
-cd client
-npm run build
-
-# Os arquivos otimizados estarão em client/dist/
-```
-
-### Deploy
-
-#### Frontend (Vercel/Netlify)
-1. Conecte o repositório
-2. Configure build command: `cd client && npm run build`
-3. Configure output directory: `client/dist`
-
-#### Backend (Railway/Heroku/VPS)
-1. Configure variáveis de ambiente
-2. Altere JWT_SECRET para valor seguro
-3. Ajuste CORS origin no `server.js`
-4. Execute: `cd server && npm start`
-
-## 🔐 Segurança
-
-- ✅ Autenticação JWT com expiração
-- ✅ Senhas criptografadas com bcrypt
-- ✅ Headers de segurança com Helmet
-- ✅ CORS configurado
-- ✅ Rate limiting para APIs
-- ✅ Validação server-side
-- ✅ Upload de arquivos com verificação de tipo
-
-**⚠️ Em produção:**
-- Altere `JWT_SECRET` no `.env`
-- Altere credenciais de admin padrão
-- Configure CORS para seu domínio
-- Use HTTPS
-- Considere adicionar variáveis de ambiente seguras
-
-## 📱 Funcionalidades do Site Público
-
-- 🎬 Hero fullscreen com vídeo
-- 📝 Formulário de reserva com validação
-- ℹ️ Seção "Sobre a Pousada"
-- 🏨 Showcase de acomodações
-- 🎁 Pacotes promocionais
-- 🖼️ Galeria de fotos com lightbox
-- 📍 Mapa de localização
-- 📧 Formulário de contato (integrado com WhatsApp)
-- 📱 Links para redes sociais
-
-## 🛠️ Tecnologias Utilizadas
-
-### Frontend
-- React 18.3.1
-- Vite 5.1.6
-- Tailwind CSS 3.4.1
-- React Router DOM 6.22.0
-- React Hook Form 7.50.1
-- React DatePicker 6.1.0
-- React Dropzone 14.2.3
-- Axios 1.6.7
-- Heroicons 2.1.1
-
-### Backend
-- Node.js
-- Express 4.18.3
-- Better-SQLite3 9.4.3
-- JWT (jsonwebtoken 9.0.2)
-- Bcrypt 2.4.3
-- AWS SDK 2.1550.0
-- Multer 1.4.5
-- Helmet 7.1.0
-- CORS 2.8.5
-
-## 📞 Suporte
-
-Para dúvidas ou problemas:
-- Verifique os logs do console (F12 no navegador)
-- Verifique os logs do servidor no terminal
-- Certifique-se de que as credenciais AWS estão corretas
-- Verifique se o bucket S3 permite uploads
-
-## 📄 Licença
-
-MIT
-
-## 🎉 Próximos Passos
-
-- [ ] Implementar sistema de reservas completo
-- [ ] Adicionar integração com gateway de pagamento
-- [ ] Criar painel de relatórios e analytics
-- [ ] Adicionar newsletter
-- [ ] Implementar sistema de avaliações
-- [ ] PWA (Progressive Web App)
-- [ ] Multi-idioma (PT/EN/ES)
+**Stack:** Vite + React + TypeScript · Tailwind CSS v4 · Cloudflare Workers (Hono) · Cloudflare D1 (SQLite) · R2.
+Tudo roda na Cloudflare — frontend (assets estáticos) e API (Worker) no mesmo deploy.
 
 ---
 
-Desenvolvido com ❤️ para a Pousada Praia Bela
+## Estrutura
+
+```
+migrations/        Schema (0001_init.sql) e conteúdo inicial (seed.sql)
+worker/            API em Hono: /api/content (público) + /api/admin/* (protegido) + auth HMAC
+src/site/          Site público (Hero, Sobre, Acomodações, Galeria, Depoimentos, etc.)
+src/admin/         Painel administrativo (login por senha + editores)
+src/lib/           Cliente de API e tipos compartilhados
+wrangler.jsonc     Configuração do Worker + binding D1 + assets (SPA)
+.dev.vars          Variáveis de desenvolvimento (senha admin / segredo) — não committar
+```
+
+## Desenvolvimento local
+
+```bash
+npm install
+
+# 1) Cria as tabelas e o conteúdo inicial no D1 local (.wrangler/state)
+npm run db:migrate:local      # aplica migrations/ (0001_init.sql + seed.sql)
+
+# 2) Sobe o site + API com hot reload
+npm run dev                   # http://localhost:5170
+```
+
+- Site: <http://localhost:5170/>
+- Admin: <http://localhost:5170/admin> — senha padrão **`admin123`** (definida em `.dev.vars`).
+
+> A senha e o segredo de assinatura ficam em `.dev.vars` (`ADMIN_PASSWORD`, `AUTH_SECRET`).
+> Troque-os antes de ir para produção.
+
+## Deploy na Cloudflare
+
+> Reutilizamos o **D1 `praiabela-db` existente** (id já preenchido em `wrangler.jsonc`).
+> A migração `0001_init.sql` **derruba as tabelas do esquema antigo** (site_info, packages,
+> promotions, experiences, posts, …) e recria no esquema novo. **Faça backup antes.**
+
+```bash
+# 1) Autentique o Wrangler
+npx wrangler login
+
+# 2) BACKUP do D1 atual antes de qualquer coisa (gera backup-praiabela-db.sql)
+npm run db:backup:remote
+
+# 3) Crie o bucket R2 para os uploads do admin
+npx wrangler r2 bucket create praiabela-media
+
+# 4) Aplique schema + seed no banco remoto (recria tabelas e popula)
+npm run db:migrate:remote
+
+# 5) Defina os segredos de produção (NÃO use os valores de .dev.vars)
+npx wrangler secret put ADMIN_PASSWORD
+npx wrangler secret put AUTH_SECRET     # use um valor longo e aleatório
+
+# 6) Build + deploy
+npm run deploy
+```
+
+O `npm run deploy` faz `vite build` e `wrangler deploy`, publicando o Worker
+(com os assets do SPA embutidos) e conectando-o ao D1.
+
+> **Migração de dados:** o conteúdo antigo de `site_info`, `rooms` e `gallery` foi
+> mapeado para o novo esquema em `migrations/seed.sql`. Recursos sem equivalente no
+> site-loft (**pacotes, promoções, experiências e blog/posts**) foram descontinuados.
+> As imagens antigas continuam servidas pelas URLs absolutas (S3 `hoteloshia` /
+> `praiabela.com.br`); **novos uploads** vão para o R2 `praiabela-media`.
+
+## Painel administrativo
+
+Acessível em `/admin`. Permite editar:
+
+| Aba | O que edita |
+|-----|-------------|
+| Geral | Nome, logo, localização, Instagram e títulos das seções |
+| Hero | **Imagem ou vídeo** de fundo, textos e barra de reserva |
+| Sobre | Eyebrow, título, parágrafos, imagens e CTA |
+| Acomodações | CRUD de quartos/suítes (foto, descrição, comodidades, ordem) |
+| Experiências | CRUD de experiências (foto, título, descrição) |
+| Pacotes | CRUD de pacotes (preço, inclusões, destaque, foto) |
+| Promoções | CRUD de promoções (desconto %, validade, foto) |
+| Blog | CRUD de postagens (slug, categoria, capa, resumo, conteúdo) |
+| Destaques & Comodidades | Tiles de destaque e ícones de comodidades |
+| Localização | Textos e imagem da seção |
+| Galeria | Fotos estilo Instagram |
+| Faixa Promo | Faixa "Conheça nossas promoções" |
+| Depoimentos | Avaliações de hóspedes (nota, autor, texto) |
+| Contato | Endereço, e-mail, telefone, redes sociais, CNPJ |
+
+O blog tem páginas próprias: `/blog` (lista) e `/blog/:slug` (postagem). As seções de
+experiências, pacotes e promoções aparecem na home (âncoras `#experiencias`, `#pacotes`,
+`#promocoes`).
+
+### Hero: imagem ↔ vídeo
+Na aba **Hero**, mude o campo *Modo de fundo* para **Vídeo** e informe a URL de um `.mp4`.
+A *URL da imagem* continua sendo usada como _poster_ (frame inicial enquanto o vídeo carrega).
+
+## Imagens (upload + compressão via R2)
+
+Os campos de imagem do admin permitem **enviar arquivos** (clique ou arraste).
+A imagem é **comprimida no navegador** (redimensionada para no máx. 800px de largura e
+convertida para WebP, ~0,72 de qualidade) antes do upload — economiza banda e armazenamento.
+
+- Upload: `POST /api/admin/upload` grava o arquivo no bucket **R2** (`BUCKET`).
+- Entrega: o Worker serve as imagens em `/files/<key>` com cache imutável de 1 ano.
+- O campo de URL continua disponível como alternativa (ex.: colar um link externo).
+- No **dev local** o R2 é emulado pelo Miniflare (em `.wrangler/state`) — não precisa
+  criar bucket para testar. Em produção, crie o bucket com
+  `npx wrangler r2 bucket create praiabela-media`.
+
+## Segurança do admin
+
+- Login por **senha única**. A senha não é armazenada no banco; é comparada (via hash SHA-256,
+  em tempo constante) com a variável `ADMIN_PASSWORD`.
+- Em caso de sucesso, o Worker emite um **token assinado (HMAC-SHA256)** com validade de 12h,
+  guardado no `localStorage` e enviado no header `Authorization: Bearer`.
+- Todas as rotas `/api/admin/*` (exceto o login) exigem token válido.
