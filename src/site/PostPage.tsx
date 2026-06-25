@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getContent } from "../lib/api";
 import type { SiteContent } from "../lib/types";
@@ -6,6 +6,76 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { formatPostDate } from "./PostCard";
 import ThemeStyle from "./ThemeStyle";
+
+// Renderiza um subconjunto de Markdown (sem dependências): títulos #/##/###,
+// listas * e -, negrito **...** e linha horizontal ---.
+function renderInline(text: string): ReactNode {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((p, i) => {
+    const m = /^\*\*([^*]+)\*\*$/.exec(p);
+    return m ? <strong key={i}>{m[1]}</strong> : <span key={i}>{p}</span>;
+  });
+}
+
+const isHeading = (l: string) => /^#{1,3}\s+/.test(l);
+const isList = (l: string) => /^[*-]\s+/.test(l);
+const isHr = (l: string) => /^---+$/.test(l);
+
+function renderMarkdown(content: string): ReactNode[] {
+  const lines = content.replace(/\r/g, "").split("\n");
+  const out: ReactNode[] = [];
+  let i = 0;
+  let key = 0;
+  while (i < lines.length) {
+    const line = lines[i].trim();
+    if (!line) { i++; continue; }
+    if (isHr(line)) { out.push(<hr key={key++} className="my-8 border-gray-200" />); i++; continue; }
+    if (isHeading(line)) {
+      const level = line.match(/^#{1,3}/)![0].length;
+      const text = line.replace(/^#{1,3}\s+/, "");
+      out.push(
+        level >= 3 ? (
+          <h3 key={key++} className="mt-6 mb-2 font-display text-lg tracking-wide text-ink">
+            {renderInline(text)}
+          </h3>
+        ) : (
+          <h2 key={key++} className="mt-8 mb-3 font-display text-2xl tracking-wide text-ink">
+            {renderInline(text)}
+          </h2>
+        ),
+      );
+      i++;
+      continue;
+    }
+    if (isList(line)) {
+      const items: string[] = [];
+      while (i < lines.length && isList(lines[i].trim())) {
+        items.push(lines[i].trim().replace(/^[*-]\s+/, ""));
+        i++;
+      }
+      out.push(
+        <ul key={key++} className="my-4 list-disc space-y-1 pl-6">
+          {items.map((it, j) => (
+            <li key={j}>{renderInline(it)}</li>
+          ))}
+        </ul>,
+      );
+      continue;
+    }
+    const para: string[] = [];
+    while (i < lines.length) {
+      const l = lines[i].trim();
+      if (!l || isHeading(l) || isList(l) || isHr(l)) break;
+      para.push(l);
+      i++;
+    }
+    out.push(
+      <p key={key++} className="my-4 leading-relaxed">
+        {renderInline(para.join(" "))}
+      </p>,
+    );
+  }
+  return out;
+}
 
 export default function PostPage() {
   const { slug } = useParams();
@@ -71,15 +141,7 @@ export default function PostPage() {
               />
             )}
 
-            <div className="space-y-4 text-base leading-relaxed text-gray-700">
-              {post.content
-                .split(/\n{2,}/)
-                .map((para) => para.trim())
-                .filter(Boolean)
-                .map((para, i) => (
-                  <p key={i}>{para}</p>
-                ))}
-            </div>
+            <div className="text-base text-gray-700">{renderMarkdown(post.content)}</div>
 
             <div className="mt-12 border-t border-gray-100 pt-6">
               <Link to="/blog" className="text-sm font-medium text-brand hover:underline">
