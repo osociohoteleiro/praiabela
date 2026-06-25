@@ -68,7 +68,7 @@ INSERT OR REPLACE INTO settings (key, value) VALUES
   "phone": "+55 (73) 98664-4644",
   "whatsapp": "557398664644",
   "instagram": "https://www.instagram.com/praiabelailheus/",
-  "facebook": "https://facebook.com/praiabela"
+  "facebook": "https://www.facebook.com/pousadapraiabelailheus"
 }'));
 
 -- ---------- Highlights ----------
