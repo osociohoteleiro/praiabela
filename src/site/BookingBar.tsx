@@ -17,9 +17,15 @@ const MAX_CHILDREN = 6;
 const MAX_CHILD_AGE = 17;
 const DEFAULT_CHILD_AGE = 6;
 
-// Motor de reservas externo (ID da propriedade já embutido na URL base).
-const BOOKING_BASE_URL =
-  "https://site-reservas.osociohoteleiro.com.br/reservar/e04c202d-20af-47cb-9443-3b44af55d9c0";
+// Motor de reservas Omnibees (ID do hotel = q). Datas no formato DDMMYYYY.
+const BOOKING_BASE_URL = "https://book.omnibees.com/hotelresults";
+const OMNIBEES_HOTEL_ID = "4071";
+
+// ISO (YYYY-MM-DD) -> DDMMYYYY exigido pelo Omnibees.
+function toOmnibeesDate(iso: string) {
+  const [y, m, d] = iso.split("-");
+  return `${d}${m}${y}`;
+}
 
 function buildBookingUrl(opts: {
   checkin: string;
@@ -29,15 +35,18 @@ function buildBookingUrl(opts: {
   rooms?: number;
 }) {
   const params = new URLSearchParams({
-    check_in: opts.checkin,
-    check_out: opts.checkout,
-    rooms: String(opts.rooms ?? 1),
-    adults: String(opts.adults),
-    children: String(opts.childAges.length),
+    q: OMNIBEES_HOTEL_ID,
+    lang: "pt",
+    currencyId: "BRL",
+    NRooms: String(opts.rooms ?? 1),
+    CheckIn: toOmnibeesDate(opts.checkin),
+    CheckOut: toOmnibeesDate(opts.checkout),
+    ad: String(opts.adults),
+    ch: String(opts.childAges.length),
   });
   if (opts.childAges.length > 0) {
-    // children_ages=4,8 (a URLSearchParams codifica a vírgula como %2C)
-    params.set("children_ages", opts.childAges.join(","));
+    // ag=5;10 — idades das crianças separadas por ponto e vírgula
+    params.set("ag", opts.childAges.join(";"));
   }
   return `${BOOKING_BASE_URL}?${params.toString()}`;
 }
