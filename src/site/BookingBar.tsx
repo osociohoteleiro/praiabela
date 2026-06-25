@@ -77,7 +77,7 @@ export default function BookingBar() {
   }
 
   return (
-    <div className="w-full max-w-5xl rounded-md bg-white/75 backdrop-blur-md shadow-xl ring-1 ring-black/5">
+    <div className="w-full max-w-5xl rounded-md bg-white/90 shadow-xl ring-1 ring-black/5">
       <div className="grid grid-cols-2 items-center gap-px md:grid-cols-[auto_1fr_1fr_1fr_auto]">
         <div className="hidden px-6 py-4 text-center text-ink md:block md:text-left">
           <p className="font-display text-sm leading-tight text-ink">

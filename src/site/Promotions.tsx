@@ -17,7 +17,7 @@ export default function Promotions({
   if (promotions.length === 0) return null;
 
   return (
-    <section id="promocoes" className="bg-brand-light/35 backdrop-blur-sm py-20">
+    <section id="promocoes" className="py-20">
       <div className="mx-auto max-w-7xl px-5">
         <div className="mb-10 text-center">
           <p className="eyebrow mb-2">{section?.eyebrow}</p>
@@ -28,7 +28,7 @@ export default function Promotions({
           {promotions.map((promo) => (
             <article
               key={promo.id}
-              className="group relative overflow-hidden rounded-lg bg-white/70 backdrop-blur-md shadow-sm transition hover:shadow-lg"
+              className="group relative overflow-hidden rounded-lg bg-white/85 shadow-sm transition hover:shadow-lg"
             >
               <div className="relative h-44 overflow-hidden">
                 <img

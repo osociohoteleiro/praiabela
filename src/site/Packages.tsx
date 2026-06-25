@@ -22,7 +22,7 @@ export default function Packages({
   if (packages.length === 0) return null;
 
   return (
-    <section id="pacotes" className="bg-white/65 backdrop-blur-md py-20">
+    <section id="pacotes" className="py-20">
       <div className="mx-auto max-w-7xl px-5">
         <div className="mb-10 text-center">
           <p className="eyebrow mb-2">{section?.eyebrow}</p>
@@ -37,7 +37,7 @@ export default function Packages({
             {packages.map((pkg) => (
             <article
               key={pkg.id}
-              className={`flex w-[85%] flex-none snap-start flex-col overflow-hidden rounded-lg border bg-white/70 backdrop-blur-md shadow-sm transition hover:shadow-lg sm:w-[46%] lg:w-[23%] ${
+              className={`flex w-[85%] flex-none snap-start flex-col overflow-hidden rounded-lg border bg-white/85 shadow-sm transition hover:shadow-lg sm:w-[46%] lg:w-[23%] ${
                 pkg.featured ? "border-brand ring-1 ring-brand/30" : "border-gray-200"
               }`}
             >

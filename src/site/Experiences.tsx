@@ -10,7 +10,7 @@ export default function Experiences({
   if (experiences.length === 0) return null;
 
   return (
-    <section id="experiencias" className="bg-brand-light/35 backdrop-blur-sm py-20">
+    <section id="experiencias" className="py-20">
       <div className="mx-auto max-w-7xl px-5">
         <div className="mb-10 text-center">
           <p className="eyebrow mb-2">{section?.eyebrow}</p>
@@ -21,7 +21,7 @@ export default function Experiences({
           {experiences.map((exp) => (
             <article
               key={exp.id}
-              className="group overflow-hidden rounded-md bg-white/70 backdrop-blur-md shadow-sm transition hover:shadow-lg"
+              className="group overflow-hidden rounded-md bg-white/85 shadow-sm transition hover:shadow-lg"
             >
               <div className="h-52 overflow-hidden">
                 <img
