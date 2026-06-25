@@ -162,11 +162,11 @@ INSERT OR REPLACE INTO settings (key, value) VALUES
 -- ---------- Tema / paleta de cores (editável na aba "Aparência" do admin) ----------
 INSERT OR REPLACE INTO settings (key, value) VALUES
 ('theme', json('{
-  "brand": "#2f8f63",
-  "brandDark": "#246b4a",
+  "brand": "#ec670e",
+  "brandDark": "#ffb514",
   "brandLight": "#e6f1ea",
   "ink": "#1f3b30",
-  "eyebrow": "#2f8f63"
+  "eyebrow": "#db7c0f"
 }'));
 
 -- ---------- Tour Virtual 360° (editável na aba "Tour Virtual 360°" do admin) ----------
