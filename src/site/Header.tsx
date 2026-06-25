@@ -31,10 +31,17 @@ export default function Header({
       <header className="fixed inset-x-0 top-0 z-40 bg-ink/95 shadow-lg backdrop-blur">
 
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
-          <Link to="/" className="flex flex-col leading-none text-white">
-            <span className="font-display text-2xl tracking-wide">{general.logoText}</span>
-            <span className="text-[0.6rem] tracking-[0.3em] text-white/80">
-              {general.logoSubtext}
+          <Link to="/" className="flex items-center gap-3 text-white">
+            <img
+              src="/logo.png"
+              alt={general.siteName}
+              className="h-12 w-auto shrink-0 md:h-14"
+            />
+            <span className="flex flex-col leading-none">
+              <span className="font-display text-2xl tracking-wide">{general.logoText}</span>
+              <span className="text-[0.6rem] tracking-[0.3em] text-white/80">
+                {general.logoSubtext}
+              </span>
             </span>
           </Link>
 
