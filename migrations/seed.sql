@@ -11,7 +11,7 @@ INSERT OR REPLACE INTO settings (key, value) VALUES
   "logoText": "PRAIA BELA",
   "logoSubtext": "POUSADA",
   "location": "Praia dos Milionários - Ilhéus/BA",
-  "instagramHandle": "@praiabela"
+  "instagramHandle": "@praiabelailheus"
 }')),
 ('hero', json('{
   "mode": "video",
@@ -67,7 +67,7 @@ INSERT OR REPLACE INTO settings (key, value) VALUES
   "email": "reservas@praiabela.com.br",
   "phone": "+55 (73) 98664-4644",
   "whatsapp": "5573986644644",
-  "instagram": "https://instagram.com/praiabela",
+  "instagram": "https://www.instagram.com/praiabelailheus/",
   "facebook": "https://facebook.com/praiabela"
 }'));
 
