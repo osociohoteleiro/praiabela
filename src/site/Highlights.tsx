@@ -34,16 +34,16 @@ export default function Highlights({
       </div>
 
       <div className="mx-auto mt-14 max-w-6xl px-5">
-        <div className="flex flex-col items-center gap-8 md:flex-row md:flex-wrap md:justify-between">
-          <h3 className="section-title max-w-xs text-xl text-ink md:text-2xl">
-            {amenitiesSection.title}
-          </h3>
+        <h3 className="section-title mb-8 text-center text-xl text-ink md:text-2xl">
+          {amenitiesSection.title}
+        </h3>
+        <div className="flex flex-wrap items-start justify-center gap-x-10 gap-y-8 md:gap-x-16">
           {amenities.map((a) => {
             const Icon = ICONS[a.icon] ?? ICONS.check;
             return (
-              <div key={a.id} className="flex flex-col items-center gap-2 text-center">
+              <div key={a.id} className="flex w-32 flex-col items-center gap-2 text-center">
                 <Icon className="h-8 w-8 text-brand" />
-                <span className="max-w-[9rem] text-sm text-gray-600">{a.label}</span>
+                <span className="text-sm text-gray-600">{a.label}</span>
               </div>
             );
           })}
