@@ -39,35 +39,50 @@ npm run dev                   # http://localhost:5170
 > A senha e o segredo de assinatura ficam em `.dev.vars` (`ADMIN_PASSWORD`, `AUTH_SECRET`).
 > Troque-os antes de ir para produção.
 
-## Deploy na Cloudflare
+## Deploy na Cloudflare Pages
+
+O projeto roda no **Cloudflare Pages**: o SPA (Vite) é servido como estático em `dist/`
+e a API Hono roda como **Pages Function** (`functions/[[path]].ts`, via adaptador
+`hono/cloudflare-pages`). O deploy acontece automaticamente a cada `git push` na `main`.
 
 > Reutilizamos o **D1 `praiabela-db` existente** (id já preenchido em `wrangler.jsonc`).
-> A migração `0001_init.sql` **derruba as tabelas do esquema antigo** (site_info, packages,
-> promotions, experiences, posts, …) e recria no esquema novo. **Faça backup antes.**
+> A migração `0001_init.sql` **derruba as tabelas do esquema antigo** e recria no esquema
+> novo. **Faça backup antes** (`npm run db:backup:remote`).
+
+### Configuração do projeto no painel do Pages (uma vez)
+
+Em **Workers & Pages → praiabela → Settings → Build**:
+
+- **Root directory:** *(vazio / raiz do repo)* — remova qualquer `client`.
+- **Build command:** `npm run build`
+- **Build output directory:** `dist`
+
+Em **Settings → Functions** (ou via `wrangler.jsonc`, já incluso):
+
+- **Compatibility flags:** `nodejs_compat`
+- **Bindings → D1:** `DB` → `praiabela-db`
+- **Bindings → R2:** `BUCKET` → `praiabela-media`
+- **Variables & Secrets (Production):** `ADMIN_PASSWORD` e `AUTH_SECRET` (valores longos/aleatórios — **não** use os de `.dev.vars`).
+
+### Preparar os recursos (uma vez, via CLI)
 
 ```bash
-# 1) Autentique o Wrangler
 npx wrangler login
-
-# 2) BACKUP do D1 atual antes de qualquer coisa (gera backup-praiabela-db.sql)
-npm run db:backup:remote
-
-# 3) Crie o bucket R2 para os uploads do admin
-npx wrangler r2 bucket create praiabela-media
-
-# 4) Aplique schema + seed no banco remoto (recria tabelas e popula)
-npm run db:migrate:remote
-
-# 5) Defina os segredos de produção (NÃO use os valores de .dev.vars)
-npx wrangler secret put ADMIN_PASSWORD
-npx wrangler secret put AUTH_SECRET     # use um valor longo e aleatório
-
-# 6) Build + deploy
-npm run deploy
+npm run db:backup:remote                      # backup do D1 antes de tudo
+npx wrangler r2 bucket create praiabela-media # bucket de uploads do admin
+npm run db:migrate:remote                     # aplica schema + seed no D1 remoto
 ```
 
-O `npm run deploy` faz `vite build` e `wrangler deploy`, publicando o Worker
-(com os assets do SPA embutidos) e conectando-o ao D1.
+Depois é só `git push` (deploy automático) ou `npm run deploy` (`wrangler pages deploy`).
+
+### Desenvolvimento full-stack local
+
+`npm run dev` sobe só o frontend (Vite, porta 5172). Para rodar **frontend + API + D1**
+localmente, use:
+
+```bash
+npm run pages:dev   # build + wrangler pages dev (http://localhost:8788)
+```
 
 > **Migração de dados:** o conteúdo antigo de `site_info`, `rooms` e `gallery` foi
 > mapeado para o novo esquema em `migrations/seed.sql`. Recursos sem equivalente no

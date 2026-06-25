@@ -12,5 +12,5 @@
     "strict": true,
     "types": ["@cloudflare/workers-types/2023-07-01"]
   },
-  "include": ["worker"]
+  "include": ["worker", "functions"]
 }

@@ -1,18 +1,13 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "praiabela",
-  "main": "./worker/index.ts",
+  // Cloudflare Pages: frontend estático (Vite) em dist/ + API como Pages Function
+  // (functions/[[path]].ts). As bindings abaixo são lidas pelo Pages (suporte a
+  // Wrangler config) e também usadas por `wrangler pages dev` localmente.
+  "pages_build_output_dir": "dist",
   "compatibility_date": "2025-05-01",
   "compatibility_flags": ["nodejs_compat"],
-  "assets": {
-    "binding": "ASSETS",
-    "not_found_handling": "single-page-application"
-  },
-  "observability": {
-    "enabled": true
-  },
   // Reutiliza o D1 existente da Praia Bela (mesmo instance id).
-  // O esquema é recriado no formato do site-loft via migrations/.
   "d1_databases": [
     {
       "binding": "DB",

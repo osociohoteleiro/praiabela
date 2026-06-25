@@ -251,9 +251,17 @@ app.get("/files/*", async (c) => {
 // ----------------------------------------------------------------------------
 // Fallback: serve o SPA (assets). Qualquer rota não-API vai para o index.html.
 // ----------------------------------------------------------------------------
-app.all("*", (c) => {
+app.all("*", async (c) => {
   if (c.req.path.startsWith("/api/")) return c.json({ error: "Not found" }, 404);
-  return c.env.ASSETS.fetch(c.req.raw);
+  const res = await c.env.ASSETS.fetch(c.req.raw);
+  // Fallback de SPA: deep links (ex.: /blog/post) que não casam com um arquivo
+  // estático devolvem o index.html para o roteador do React assumir.
+  if (res.status === 404 && c.req.method === "GET") {
+    const url = new URL(c.req.url);
+    url.pathname = "/";
+    return c.env.ASSETS.fetch(new Request(url.toString(), c.req.raw));
+  }
+  return res;
 });
 
 export default app;
