@@ -11,6 +11,8 @@ export default function Promo({ promo }: { promo: PromoSettings }) {
         </h2>
         <a
           href={promo.ctaUrl || "#"}
+          target={/^https?:\/\//i.test(promo.ctaUrl) ? "_blank" : undefined}
+          rel={/^https?:\/\//i.test(promo.ctaUrl) ? "noreferrer" : undefined}
           className="btn-brand mt-8 rounded px-10 py-4 text-sm font-medium tracking-widest"
         >
           {promo.ctaLabel}
