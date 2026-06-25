@@ -58,7 +58,7 @@ INSERT OR REPLACE INTO settings (key, value) VALUES
   "title": "CONHEÇA NOSSAS PROMOÇÕES",
   "ctaLabel": "FALE CONOSCO",
   "ctaUrl": "https://wa.me/557398664644",
-  "image": "https://hoteloshia.s3.us-east-2.amazonaws.com/gallery/1768933087278-gallery-11.jpg"
+  "image": "/promocao.jpg"
 }')),
 ('contact', json('{
   "cnpj": "",
