@@ -55,7 +55,7 @@ export default function BookingBar() {
   const today = todayISO(0);
   const [checkin, setCheckin] = useState(today);
   const [checkout, setCheckout] = useState(todayISO(1));
-  const [adults, setAdults] = useState(1);
+  const [adults, setAdults] = useState(2);
   const [childAges, setChildAges] = useState<number[]>([]);
 
   function nextDay(iso: string) {
