@@ -18,7 +18,7 @@ export default function Rooms({
   };
 
   return (
-    <section id="acomodacoes" className="bg-white py-20">
+    <section id="acomodacoes" className="py-20">
       <div className="mx-auto max-w-7xl px-5">
         <div className="mb-10">
           <p className="eyebrow mb-2">{section.eyebrow}</p>

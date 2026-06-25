@@ -10,7 +10,7 @@ export function formatPostDate(date: string): string {
 
 export default function PostCard({ post }: { post: Post }) {
   return (
-    <article className="group flex flex-col overflow-hidden rounded-lg bg-white shadow-sm transition hover:shadow-lg">
+    <article className="group flex flex-col overflow-hidden rounded-lg bg-white/85 shadow-sm transition hover:shadow-lg">
       <Link to={`/blog/${post.slug}`} className="block h-48 overflow-hidden">
         <img
           src={post.cover_image}

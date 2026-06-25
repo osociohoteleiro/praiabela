@@ -108,7 +108,7 @@ export default function PostPage() {
   const post = posts.find((p) => p.slug === slug);
 
   return (
-    <div className="bg-white">
+    <div>
       <ThemeStyle theme={settings.theme} />
       <Header general={settings.general} contact={settings.contact} />
 

@@ -19,6 +19,13 @@ body {
   font-family: var(--font-sans);
   color: #2d2d2d;
   -webkit-font-smoothing: antialiased;
+  /* Imagem de fundo do site (discreta): fixa, aparece atrás das áreas/seções
+     sem fundo sólido. */
+  background-image: url("/fundo.jpeg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
 }
 
 h1, h2, h3, .font-display {
