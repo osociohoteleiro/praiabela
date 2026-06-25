@@ -37,7 +37,7 @@ export default function Packages({
             {packages.map((pkg) => (
             <article
               key={pkg.id}
-              className={`flex w-[85%] flex-none snap-start flex-col overflow-hidden rounded-lg border bg-white shadow-sm transition hover:shadow-lg sm:w-[60%] lg:w-[31.5%] ${
+              className={`flex w-[85%] flex-none snap-start flex-col overflow-hidden rounded-lg border bg-white shadow-sm transition hover:shadow-lg sm:w-[46%] lg:w-[23%] ${
                 pkg.featured ? "border-brand ring-1 ring-brand/30" : "border-gray-200"
               }`}
             >
