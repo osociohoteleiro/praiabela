@@ -112,28 +112,48 @@ export default function Header({
       </header>
 
       {/* Barra social fixa lateral */}
-      <div className="fixed right-3 top-1/2 z-30 hidden -translate-y-1/2 flex-col gap-3 md:flex">
-        <SocialIcon href={contact.facebook}>
+      <div className="fixed right-4 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-3.5 md:flex">
+        <SocialIcon href={contact.facebook} label="Facebook" className="bg-[#1877F2]">
           <FacebookIcon className="h-5 w-5" />
         </SocialIcon>
-        <SocialIcon href={contact.instagram}>
+        <SocialIcon
+          href={contact.instagram}
+          label="Instagram"
+          className="bg-gradient-to-br from-[#feda75] via-[#d62976] to-[#4f5bd5]"
+        >
           <InstagramIcon className="h-5 w-5" />
         </SocialIcon>
-        <SocialIcon href={`https://wa.me/${contact.whatsapp}`}>
-          <WhatsappIcon className="h-5 w-5" />
+        <SocialIcon
+          href={`https://wa.me/${contact.whatsapp}`}
+          label="WhatsApp"
+          className="bg-[#25D366]"
+        >
+          <WhatsappIcon className="h-6 w-6" />
         </SocialIcon>
       </div>
     </>
   );
 }
 
-function SocialIcon({ href, children }: { href: string; children: React.ReactNode }) {
+function SocialIcon({
+  href,
+  label,
+  className = "",
+  children,
+}: {
+  href: string;
+  label: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
   return (
     <a
       href={href}
       target="_blank"
       rel="noreferrer"
-      className="grid h-9 w-9 place-items-center rounded-full bg-white/20 text-white backdrop-blur transition hover:bg-brand"
+      aria-label={label}
+      title={label}
+      className={`grid h-12 w-12 place-items-center rounded-full text-white shadow-lg ring-1 ring-white/40 transition-transform duration-200 hover:scale-110 hover:shadow-xl ${className}`}
     >
       {children}
     </a>
