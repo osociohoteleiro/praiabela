@@ -1,5 +1,6 @@
+import { useRef } from "react";
 import type { Package, SectionTitle } from "../lib/types";
-import { CheckIcon } from "./icons";
+import { CheckIcon, ChevronLeft, ChevronRight } from "./icons";
 
 const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -10,6 +11,14 @@ export default function Packages({
   packages: Package[];
   section: SectionTitle;
 }) {
+  const scroller = useRef<HTMLDivElement>(null);
+
+  const scroll = (dir: number) => {
+    const el = scroller.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * (el.clientWidth * 0.8), behavior: "smooth" });
+  };
+
   if (packages.length === 0) return null;
 
   return (
@@ -20,11 +29,15 @@ export default function Packages({
           <h2 className="section-title text-3xl md:text-4xl">{section?.title}</h2>
         </div>
 
-        <div className="grid gap-7 md:grid-cols-2 lg:grid-cols-3">
-          {packages.map((pkg) => (
+        <div className="relative">
+          <div
+            ref={scroller}
+            className="no-scrollbar flex snap-x gap-7 overflow-x-auto scroll-smooth pb-2"
+          >
+            {packages.map((pkg) => (
             <article
               key={pkg.id}
-              className={`flex flex-col overflow-hidden rounded-lg border bg-white shadow-sm transition hover:shadow-lg ${
+              className={`flex w-[85%] flex-none snap-start flex-col overflow-hidden rounded-lg border bg-white shadow-sm transition hover:shadow-lg sm:w-[60%] lg:w-[31.5%] ${
                 pkg.featured ? "border-brand ring-1 ring-brand/30" : "border-gray-200"
               }`}
             >
@@ -74,7 +87,23 @@ export default function Packages({
                 </div>
               </div>
             </article>
-          ))}
+            ))}
+          </div>
+
+          <button
+            onClick={() => scroll(-1)}
+            className="absolute -left-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white text-brand shadow-lg transition hover:bg-brand hover:text-white"
+            aria-label="Anterior"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => scroll(1)}
+            className="absolute -right-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white text-brand shadow-lg transition hover:bg-brand hover:text-white"
+            aria-label="Próximo"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
         </div>
       </div>
     </section>
