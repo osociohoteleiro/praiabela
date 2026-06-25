@@ -53,7 +53,7 @@ export default function SitePage() {
     content;
 
   return (
-    <div className="bg-white">
+    <div>
       <ThemeStyle theme={settings.theme} />
       <Header general={settings.general} contact={settings.contact} />
       <Hero hero={settings.hero} />
