@@ -11,7 +11,7 @@ export default function Gallery({
   handle: string;
 }) {
   return (
-    <section id="galeria" className="bg-white py-20">
+    <section id="galeria" className="bg-white/65 backdrop-blur-md py-20">
       <div className="mx-auto max-w-7xl px-5">
         <div className="mb-10 flex items-center gap-6">
           <span className="hidden h-px flex-1 bg-gray-200 md:block" />

@@ -21,7 +21,7 @@ export default function Experiences({
           {experiences.map((exp) => (
             <article
               key={exp.id}
-              className="group overflow-hidden rounded-md bg-white shadow-sm transition hover:shadow-lg"
+              className="group overflow-hidden rounded-md bg-white/70 backdrop-blur-md shadow-sm transition hover:shadow-lg"
             >
               <div className="h-52 overflow-hidden">
                 <img
