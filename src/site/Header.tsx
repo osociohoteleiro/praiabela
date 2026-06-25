@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import type { GeneralSettings, ContactSettings } from "../lib/types";
 import { PinIcon, FacebookIcon, InstagramIcon, WhatsappIcon } from "./icons";
 
@@ -20,22 +20,16 @@ export default function Header({
   general: GeneralSettings;
   contact: ContactSettings;
 }) {
-  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  // Links de âncora (#sobre, #acomodacoes...) só existem na home. Fora dela,
+  // prefixamos com "/" para voltar à home e então rolar até a seção.
+  const onHome = useLocation().pathname === "/";
+  const anchor = (href: string) => (onHome ? href : `/${href}`);
 
   return (
     <>
-      <header
-        className={`fixed inset-x-0 top-0 z-40 transition-colors duration-300 ${
-          scrolled ? "bg-ink/95 shadow-lg backdrop-blur" : "bg-gradient-to-b from-black/50 to-transparent"
-        }`}
-      >
+      <header className="fixed inset-x-0 top-0 z-40 bg-ink/95 shadow-lg backdrop-blur">
+
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
           <Link to="/" className="flex flex-col leading-none text-white">
             <span className="font-display text-2xl tracking-wide">{general.logoText}</span>
@@ -51,7 +45,7 @@ export default function Header({
                   {n.label}
                 </Link>
               ) : (
-                <a key={n.label} href={n.href} className="transition hover:text-brand">
+                <a key={n.label} href={anchor(n.href!)} className="transition hover:text-brand">
                   {n.label}
                 </a>
               ),
@@ -63,7 +57,7 @@ export default function Header({
               <PinIcon className="h-4 w-4" /> {general.location}
             </span>
             <a
-              href="#reservar"
+              href={anchor("#reservar")}
               className="btn-brand rounded px-5 py-3 text-sm font-medium tracking-wider"
             >
               FAÇA UMA RESERVA
@@ -96,7 +90,7 @@ export default function Header({
               ) : (
                 <a
                   key={n.label}
-                  href={n.href}
+                  href={anchor(n.href!)}
                   onClick={() => setOpen(false)}
                   className="border-b border-white/10 py-2 text-sm tracking-wide text-white"
                 >
@@ -104,7 +98,7 @@ export default function Header({
                 </a>
               ),
             )}
-            <a href="#reservar" className="btn-brand mt-3 rounded px-5 py-3 text-center text-sm">
+            <a href={anchor("#reservar")} className="btn-brand mt-3 rounded px-5 py-3 text-center text-sm">
               FAÇA UMA RESERVA
             </a>
           </nav>
