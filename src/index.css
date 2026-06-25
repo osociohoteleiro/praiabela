@@ -19,9 +19,10 @@ body {
   font-family: var(--font-sans);
   color: #2d2d2d;
   -webkit-font-smoothing: antialiased;
-  /* Imagem de fundo do site (discreta): fixa, aparece atrás das áreas/seções
-     sem fundo sólido. */
-  background-image: url("/fundo.jpeg");
+  /* Imagem de fundo do site: fixa, com uma camada branca por cima para
+     suavizar o padrão (quanto maior o alpha, mais fraco o fundo). */
+  background-image: linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.65)),
+    url("/fundo.jpeg");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
