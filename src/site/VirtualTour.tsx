@@ -57,7 +57,7 @@ export default function VirtualTour({ tour }: { tour?: TourSettings | null }) {
   if (!tour?.enabled || !tour.url) return null;
 
   return (
-    <section id="tour" className="bg-brand-light py-20">
+    <section id="tour" className="bg-brand-light/35 backdrop-blur-sm py-20">
       <div className="mx-auto max-w-6xl px-5">
         <div className="mb-8 text-center">
           {tour.eyebrow && <p className="eyebrow mb-2">{tour.eyebrow}</p>}

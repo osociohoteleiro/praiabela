@@ -13,7 +13,7 @@ export default function Highlights({
   amenitiesSection: SectionTitle;
 }) {
   return (
-    <section id="destaques" className="bg-white pb-16">
+    <section id="destaques" className="bg-white/65 backdrop-blur-md pb-16">
       <h2 className="section-title mb-10 text-center text-3xl md:text-4xl">
         {highlightsSection.title}
       </h2>

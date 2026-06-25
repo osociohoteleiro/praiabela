@@ -17,7 +17,7 @@ export default function Promotions({
   if (promotions.length === 0) return null;
 
   return (
-    <section id="promocoes" className="bg-brand-light py-20">
+    <section id="promocoes" className="bg-brand-light/35 backdrop-blur-sm py-20">
       <div className="mx-auto max-w-7xl px-5">
         <div className="mb-10 text-center">
           <p className="eyebrow mb-2">{section?.eyebrow}</p>

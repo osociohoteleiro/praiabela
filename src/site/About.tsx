@@ -3,7 +3,7 @@ import type { AboutSettings } from "../lib/types";
 export default function About({ about }: { about: AboutSettings }) {
   const [main, ...rest] = about.images ?? [];
   return (
-    <section id="sobre" className="bg-white pt-28 pb-20">
+    <section id="sobre" className="bg-white/65 backdrop-blur-md pt-28 pb-20">
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 lg:grid-cols-2">
         <div>
           <p className="eyebrow mb-4">{about.eyebrow}</p>

@@ -22,7 +22,7 @@ export default function Packages({
   if (packages.length === 0) return null;
 
   return (
-    <section id="pacotes" className="bg-white py-20">
+    <section id="pacotes" className="bg-white/65 backdrop-blur-md py-20">
       <div className="mx-auto max-w-7xl px-5">
         <div className="mb-10 text-center">
           <p className="eyebrow mb-2">{section?.eyebrow}</p>

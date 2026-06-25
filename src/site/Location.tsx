@@ -2,7 +2,7 @@ import type { LocationSettings } from "../lib/types";
 
 export default function Location({ location }: { location: LocationSettings }) {
   return (
-    <section id="localizacao" className="relative overflow-hidden bg-brand-light/40 py-20">
+    <section id="localizacao" className="relative overflow-hidden bg-brand-light/25 backdrop-blur-sm py-20">
       <div className="mx-auto grid max-w-7xl items-center gap-0 px-5 lg:grid-cols-2">
         <div className="z-10 rounded-md bg-white p-8 shadow-xl lg:mr-[-3rem] lg:p-12">
           <p className="eyebrow mb-3 text-center">{location.eyebrow}</p>
