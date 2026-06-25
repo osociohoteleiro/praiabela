@@ -36,7 +36,7 @@ export default function BlogPage() {
   const { settings, posts } = content;
 
   return (
-    <div>
+    <div className="bg-white">
       <ThemeStyle theme={settings.theme} />
       <Header general={settings.general} contact={settings.contact} />
 

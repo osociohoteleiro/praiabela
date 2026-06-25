@@ -15,7 +15,7 @@ export default function Testimonials({
   const slice = testimonials.slice(page * perPage, page * perPage + perPage);
 
   return (
-    <section className="py-20">
+    <section className="bg-white py-20">
       <div className="mx-auto max-w-6xl px-5">
         <h2 className="section-title mb-12 text-center text-2xl md:text-3xl">{section.title}</h2>
 
