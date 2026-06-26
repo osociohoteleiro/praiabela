@@ -97,10 +97,40 @@ export const PinIcon = (props: IconProps) => (
   </svg>
 );
 
+export const PawIcon = (props: IconProps) => (
+  <svg {...base(props)} fill="currentColor" stroke="none">
+    <ellipse cx="5.5" cy="12.5" rx="1.7" ry="2.2" />
+    <ellipse cx="9.5" cy="8.5" rx="1.8" ry="2.4" />
+    <ellipse cx="14.5" cy="8.5" rx="1.8" ry="2.4" />
+    <ellipse cx="18.5" cy="12.5" rx="1.7" ry="2.2" />
+    <path d="M12 12.5c-2.6 0-4.7 1.9-5.4 3.9-.5 1.5.6 3 2.2 3 1 0 2-.5 3.2-.5s2.2.5 3.2.5c1.6 0 2.7-1.5 2.2-3-.7-2-2.8-3.9-5.4-3.9z" />
+  </svg>
+);
+
+export const UtensilsIcon = (props: IconProps) => (
+  <svg {...base(props)}>
+    <path d="M7 2v6a2 2 0 0 1-4 0V2" />
+    <path d="M5 8v14" />
+    <path d="M17 2c-1.7 0-3 2.2-3 5s1.3 5 3 5" />
+    <path d="M17 2v20" />
+  </svg>
+);
+
+export const CoffeeIcon = (props: IconProps) => (
+  <svg {...base(props)}>
+    <path d="M17 8h1.5a2.5 2.5 0 0 1 0 5H17" />
+    <path d="M3 8h14v6a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z" />
+    <path d="M7 1.5v2M11 1.5v2" />
+  </svg>
+);
+
 export const ICONS: Record<string, (p: IconProps) => React.ReactElement> = {
   wifi: WifiIcon,
   car: CarIcon,
   "credit-card": CardIcon,
   child: ChildIcon,
   check: CheckIcon,
+  paw: PawIcon,
+  restaurant: UtensilsIcon,
+  coffee: CoffeeIcon,
 };

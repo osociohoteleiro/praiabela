@@ -84,9 +84,11 @@ DELETE FROM amenities;
 INSERT INTO amenities (icon, label, sort_order) VALUES
 ('wifi', 'Wi-Fi gratuito', 1),
 ('car', 'Estacionamento gratuito', 2),
-('check', 'Café da manhã incluso', 3),
+('coffee', 'Café da manhã incluso', 3),
 ('credit-card', 'Parcelamento facilitado', 4),
-('check', 'Ar-condicionado em todos os quartos', 5);
+('check', 'Ar-condicionado em todos os quartos', 5),
+('paw', 'Pet friendly', 6),
+('restaurant', 'Restaurante aberto ao público', 7);
 
 -- ---------- Rooms (migrados de praiabela-db) ----------
 DELETE FROM rooms;
