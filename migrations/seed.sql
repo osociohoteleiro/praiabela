@@ -16,7 +16,7 @@ INSERT OR REPLACE INTO settings (key, value) VALUES
 ('hero', json('{
   "mode": "video",
   "imageUrl": "https://hoteloshia.s3.us-east-2.amazonaws.com/gallery/1768933086293-gallery-10.jpg",
-  "videoUrl": "/files/uploads/videoapresentacao.mp4",
+  "videoUrl": "/files/uploads/videoapresentacao.mp4?v=2",
   "badge": "o melhor preço garantido",
   "title": "Sua Casa à Beira-Mar em Ilhéus",
   "subtitle": "Há mais de 20 anos acolhendo hóspedes com dedicação e carinho na Praia dos Milionários.",
