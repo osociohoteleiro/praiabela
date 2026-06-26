@@ -239,12 +239,28 @@ app.route("/api", api);
 app.get("/files/*", async (c) => {
   const key = decodeURIComponent(c.req.path.replace(/^\/files\//, ""));
   if (!key) return c.notFound();
-  const obj = await c.env.BUCKET.get(key);
+
+  // Revalidação por ETag: se o cliente já tem a versão atual, devolve 304 sem
+  // corpo. Assim, sobrescrever um arquivo mantendo o mesmo nome (ex.: o vídeo
+  // do banner) passa a refletir sozinho — sem precisar versionar a URL.
+  const ifNoneMatch = c.req.header("if-none-match");
+  const obj = await c.env.BUCKET.get(
+    key,
+    ifNoneMatch ? { onlyIf: { etagDoesNotMatch: ifNoneMatch } } : undefined,
+  );
   if (!obj) return c.notFound();
+
   const headers = new Headers();
   obj.writeHttpMetadata(headers);
   headers.set("etag", obj.httpEtag);
-  headers.set("Cache-Control", "public, max-age=31536000, immutable");
+  // Cache curto + revalidação: guardado por 5 min no navegador/CDN e, depois,
+  // revalidado via ETag (304 barato quando nada mudou).
+  headers.set("Cache-Control", "public, max-age=300, must-revalidate");
+
+  // Quando o ETag bate (objeto não mudou), o R2 devolve um R2Object sem corpo.
+  if (!("body" in obj)) {
+    return new Response(null, { status: 304, headers });
+  }
   return new Response(obj.body, { headers });
 });
 
