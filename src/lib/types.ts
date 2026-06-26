@@ -95,6 +95,7 @@ export interface Amenity {
   id: number;
   icon: string;
   label: string;
+  description: string;
   sort_order: number;
 }
 

@@ -51,6 +51,7 @@ const HIGHLIGHT_FIELDS: FieldDef[] = [
 const AMENITY_FIELDS: FieldDef[] = [
   { key: "label", label: "Texto", type: "text" },
   { key: "icon", label: "Ícone", type: "icon" },
+  { key: "description", label: "Descrição (popup)", type: "textarea" },
 ];
 const TESTIMONIAL_FIELDS: FieldDef[] = [
   { key: "title", label: "Título", type: "text" },
@@ -255,7 +256,7 @@ export default function AdminApp() {
           {tab === "destaques" && (
             <div className="space-y-8">
               <TableEditor table="highlights" title="Destaques (tiles)" fields={HIGHLIGHT_FIELDS} defaults={{ title: "Novo destaque", image_url: "", sort_order: 99 }} />
-              <TableEditor table="amenities" title="Comodidades (ícones)" fields={AMENITY_FIELDS} defaults={{ label: "Nova comodidade", icon: "check", sort_order: 99 }} />
+              <TableEditor table="amenities" title="Comodidades (ícones)" fields={AMENITY_FIELDS} defaults={{ label: "Nova comodidade", icon: "check", description: "", sort_order: 99 }} />
             </div>
           )}
           {tab === "localizacao" && <LocationEditor initial={s.location} />}

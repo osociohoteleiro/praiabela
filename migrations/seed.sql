@@ -83,14 +83,14 @@ INSERT INTO highlights (title, image_url, sort_order) VALUES
 
 -- ---------- Amenities ----------
 DELETE FROM amenities;
-INSERT INTO amenities (icon, label, sort_order) VALUES
-('wifi', 'Wi-Fi gratuito', 1),
-('car', 'Estacionamento gratuito', 2),
-('coffee', 'Café da manhã incluso', 3),
-('credit-card', 'Parcelamento facilitado', 4),
-('snow', 'Ar-condicionado em todos os quartos', 5),
-('paw', 'Pet friendly', 6),
-('restaurant', 'Restaurante aberto ao público', 7);
+INSERT INTO amenities (icon, label, description, sort_order) VALUES
+('wifi', 'Wi-Fi gratuito', 'Internet Wi-Fi gratuita e de alta velocidade em toda a pousada — nas acomodações e nas áreas comuns.', 1),
+('car', 'Estacionamento gratuito', 'Estacionamento gratuito para hóspedes, dentro da pousada, com acesso fácil e seguro.', 2),
+('coffee', 'Café da manhã incluso', 'Café da manhã farto incluso na diária, com itens regionais preparados com carinho. Também aberto ao público.', 3),
+('credit-card', 'Parcelamento facilitado', 'Parcele a sua reserva com condições facilitadas. Consulte as opções no momento da reserva.', 4),
+('snow', 'Ar-condicionado em todos os quartos', 'Todas as acomodações têm ar-condicionado, além de Smart TV, frigobar, cofre, secador e varanda privativa.', 5),
+('paw', 'Pet friendly', 'Aceitamos animais de estimação para que o seu pet aproveite a estadia com você. Consulte as regras no momento da reserva.', 6),
+('restaurant', 'Restaurante aberto ao público', 'A pousada possui um restaurante que oferece refeições, porções e drinks, com preços separados. O restaurante está aberto ao público, assim como o café da manhã, todos os dias, das 11:00 às 21:30.', 7);
 
 -- ---------- Rooms (migrados de praiabela-db) ----------
 DELETE FROM rooms;

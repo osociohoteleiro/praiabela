@@ -21,7 +21,7 @@ const app = new Hono<{ Bindings: Env; Variables: Variables }>();
 const TABLES: Record<string, string[]> = {
   rooms: ["title", "subtitle", "description", "image_url", "amenities", "sort_order"],
   highlights: ["title", "image_url", "sort_order"],
-  amenities: ["icon", "label", "sort_order"],
+  amenities: ["icon", "label", "description", "sort_order"],
   testimonials: ["title", "quote", "author", "rating", "sort_order"],
   gallery: ["image_url", "caption", "sort_order"],
   experiences: ["title", "description", "image_url", "sort_order"],
