@@ -37,11 +37,11 @@ export default function Highlights({
         <h3 className="section-title mb-8 text-center text-xl text-ink md:text-2xl">
           {amenitiesSection.title}
         </h3>
-        <div className="flex flex-wrap items-start justify-center gap-x-10 gap-y-8 md:gap-x-16">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-4 lg:grid-cols-7">
           {amenities.map((a) => {
             const Icon = ICONS[a.icon] ?? ICONS.check;
             return (
-              <div key={a.id} className="flex w-32 flex-col items-center gap-2 text-center">
+              <div key={a.id} className="flex flex-col items-center gap-2 px-1 text-center">
                 <Icon className="h-8 w-8 text-brand" />
                 <span className="text-sm text-gray-600">{a.label}</span>
               </div>

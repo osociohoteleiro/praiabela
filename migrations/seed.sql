@@ -88,7 +88,7 @@ INSERT INTO amenities (icon, label, sort_order) VALUES
 ('car', 'Estacionamento gratuito', 2),
 ('coffee', 'Café da manhã incluso', 3),
 ('credit-card', 'Parcelamento facilitado', 4),
-('check', 'Ar-condicionado em todos os quartos', 5),
+('snow', 'Ar-condicionado em todos os quartos', 5),
 ('paw', 'Pet friendly', 6),
 ('restaurant', 'Restaurante aberto ao público', 7);
 
