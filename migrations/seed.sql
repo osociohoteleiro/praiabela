@@ -26,8 +26,10 @@ INSERT OR REPLACE INTO settings (key, value) VALUES
   "eyebrow": "SOBRE A POUSADA",
   "title": "UMA EXPERIÊNCIA ÚNICA À BEIRA-MAR EM ILHÉUS, BAHIA",
   "paragraphs": [
-    "Há mais de 20 anos a Pousada Praia Bela tem acolhido hóspedes com grande dedicação e carinho. Localizada na Praia dos Milionários em Ilhéus, Bahia, oferecemos uma experiência única com infraestrutura completa: restaurante com culinária baiana, café da manhã farto, piscina com deck, sala de jogos, áreas de leitura e descanso, além do exclusivo Spa do Cacau.",
-    "Todos os nossos apartamentos possuem Smart TV, telefone, frigobar, cofre, secador de cabelo, ar-condicionado, colchão box e varanda privativa. Visite nossa mini fazenda de cacau e aprenda sobre a produção de chocolate, conectando-se com a herança agrícola da região."
+    "Há mais de 20 anos, a Pousada Praia Bela acolhe hóspedes com dedicação, carinho e hospitalidade. Localizada na Praia dos Milionários, em Ilhéus, Bahia, oferece uma experiência completa para quem busca conforto, lazer e conexão com a cultura local.",
+    "Nossa estrutura conta com restaurante aberto ao público, com culinária baiana, café da manhã farto, piscina com deck, sala de jogos, áreas de leitura e descanso, além do exclusivo Spa do Cacau.",
+    "A pousada também é pet friendly, permitindo que você aproveite sua estadia acompanhado do seu animal de estimação.",
+    "Todos os apartamentos possuem Smart TV, telefone, frigobar, cofre, secador de cabelo, ar-condicionado, colchão box e varanda privativa. Além disso, os hóspedes podem visitar nossa mini fazenda de cacau e aprender sobre a produção de chocolate, conectando-se com a herança agrícola da região."
   ],
   "ctaLabel": "FAÇA UMA RESERVA",
   "ctaUrl": "#reservar",
