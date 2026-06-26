@@ -65,24 +65,26 @@ export default function Footer({
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-between gap-4 pt-8 text-sm text-white/70 md:flex-row">
+        <div className="flex flex-col items-center justify-between gap-4 pt-8 text-sm text-white/70 md:flex-row md:items-start">
           <p>
             © {new Date().getFullYear()} {general.siteName}. Todos os direitos reservados.
           </p>
-          <p className="text-white/60">
-            Desenvolvido por{" "}
-            <a
-              href="https://inovaihotel.com"
-              target="_blank"
-              rel="noreferrer"
-              className="text-white/80 transition hover:text-white"
-            >
-              Inovaihotel
+          <div className="flex flex-col items-center gap-1 md:items-end">
+            <a href="/admin" className="text-white/60 transition hover:text-white">
+              Painel administrativo
             </a>
-          </p>
-          <a href="/admin" className="text-white/60 transition hover:text-white">
-            Painel administrativo
-          </a>
+            <p className="text-white/60">
+              Site desenvolvido por{" "}
+              <a
+                href="https://inovaihotel.com"
+                target="_blank"
+                rel="noreferrer"
+                className="text-white/80 transition hover:text-white"
+              >
+                Inovaihotel
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </footer>
