@@ -63,7 +63,7 @@ INSERT OR REPLACE INTO settings (key, value) VALUES
   "image": "/promocao.jpg"
 }')),
 ('contact', json('{
-  "cnpj": "",
+  "cnpj": "04.041.848/0001-10",
   "groupText": "A Pousada Praia Bela proporciona as melhores experiências de hospedagem, conforto e gastronomia baiana na Praia dos Milionários, em Ilhéus - BA.",
   "address": "Praia dos Milionários - Ilhéus/BA",
   "email": "reservas@praiabela.com.br",

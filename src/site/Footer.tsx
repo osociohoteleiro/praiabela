@@ -20,9 +20,16 @@ export default function Footer({
       <div className="mx-auto max-w-7xl px-5 py-16">
         <div className="grid gap-12 border-b border-white/15 pb-12 lg:grid-cols-2">
           <div>
-            <div className="flex flex-col leading-none">
-              <span className="font-display text-3xl tracking-wide">{general.logoText}</span>
-              <span className="text-xs tracking-[0.3em] text-white/70">{general.logoSubtext}</span>
+            <div className="flex items-center gap-4">
+              <img
+                src="/logo.png"
+                alt={general.siteName}
+                className="h-14 w-auto shrink-0 md:h-16"
+              />
+              <span className="flex flex-col leading-none">
+                <span className="font-display text-3xl tracking-wide">{general.logoText}</span>
+                <span className="text-xs tracking-[0.3em] text-white/70">{general.logoSubtext}</span>
+              </span>
             </div>
             <p className="mt-4 text-sm text-white/70">CNPJ {contact.cnpj}</p>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-white/85">{contact.groupText}</p>
@@ -61,6 +68,17 @@ export default function Footer({
         <div className="flex flex-col items-center justify-between gap-4 pt-8 text-sm text-white/70 md:flex-row">
           <p>
             © {new Date().getFullYear()} {general.siteName}. Todos os direitos reservados.
+          </p>
+          <p className="text-white/60">
+            Desenvolvido por{" "}
+            <a
+              href="https://inovaihotel.com"
+              target="_blank"
+              rel="noreferrer"
+              className="text-white/80 transition hover:text-white"
+            >
+              Inovaihotel
+            </a>
           </p>
           <a href="/admin" className="text-white/60 transition hover:text-white">
             Painel administrativo
