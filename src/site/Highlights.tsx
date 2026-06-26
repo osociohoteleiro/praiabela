@@ -65,11 +65,11 @@ export default function Highlights({
                 {hasInfo && (
                   <div
                     role="tooltip"
-                    className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-3 w-64 max-w-[80vw] -translate-x-1/2 translate-y-1 rounded-lg bg-white p-4 text-left text-sm leading-relaxed text-gray-700 opacity-0 shadow-xl ring-1 ring-black/5 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100"
+                    className="pointer-events-none absolute top-full left-1/2 z-20 mt-3 w-64 max-w-[80vw] -translate-x-1/2 -translate-y-1 rounded-lg bg-white p-4 text-left text-sm leading-relaxed text-gray-700 opacity-0 shadow-xl ring-1 ring-black/5 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100"
                   >
                     <p className="mb-1 font-medium text-ink">{a.label}</p>
                     {a.description}
-                    <span className="absolute left-1/2 top-full h-3 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-white" />
+                    <span className="absolute left-1/2 top-0 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-white" />
                   </div>
                 )}
               </div>

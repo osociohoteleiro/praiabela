@@ -88,7 +88,7 @@ INSERT INTO amenities (icon, label, description, sort_order) VALUES
 ('car', 'Estacionamento gratuito', 'Estacionamento gratuito para hóspedes, dentro da pousada, com acesso fácil e seguro.', 2),
 ('coffee', 'Café da manhã incluso', 'Café da manhã farto incluso na diária, com itens regionais preparados com carinho. Também aberto ao público.', 3),
 ('credit-card', 'Parcelamento facilitado', 'Parcele a sua reserva com condições facilitadas. Consulte as opções no momento da reserva.', 4),
-('snow', 'Ar-condicionado em todos os quartos', 'Todas as acomodações têm ar-condicionado, além de Smart TV, frigobar, cofre, secador e varanda privativa.', 5),
+('snow', 'Ar-condicionado em todos os quartos', 'Ambiente totalmente climatizado: contamos com ar-condicionado para garantir o seu conforto durante toda a estadia.', 5),
 ('paw', 'Pet friendly', 'Aceitamos animais de estimação para que o seu pet aproveite a estadia com você. Consulte as regras no momento da reserva.', 6),
 ('restaurant', 'Restaurante aberto ao público', 'A pousada possui um restaurante que oferece refeições, porções e drinks, com preços separados. O restaurante está aberto ao público, assim como o café da manhã, todos os dias, das 11:00 às 21:30.', 7);
 
