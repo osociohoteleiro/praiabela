@@ -156,6 +156,13 @@ export interface Post {
   sort_order: number;
 }
 
+/** Posts em ordem cronológica decrescente (mais recente primeiro). */
+export function sortPostsByDateDesc(posts: Post[]): Post[] {
+  return [...posts].sort((a, b) =>
+    String(b.published_at ?? "").localeCompare(String(a.published_at ?? "")),
+  );
+}
+
 export interface SiteContent {
   settings: {
     general: GeneralSettings;

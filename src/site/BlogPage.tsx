@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getContent } from "../lib/api";
-import type { SiteContent } from "../lib/types";
+import { sortPostsByDateDesc, type SiteContent } from "../lib/types";
 import Header from "./Header";
 import Footer from "./Footer";
 import PostCard from "./PostCard";
@@ -34,6 +34,7 @@ export default function BlogPage() {
   }
 
   const { settings, posts } = content;
+  const orderedPosts = sortPostsByDateDesc(posts);
 
   return (
     <div>
@@ -50,7 +51,7 @@ export default function BlogPage() {
           <p className="text-center text-gray-500">Nenhuma postagem publicada ainda.</p>
         ) : (
           <div className="grid gap-7 md:grid-cols-2 lg:grid-cols-3">
-            {posts.map((post) => (
+            {orderedPosts.map((post) => (
               <PostCard key={post.id} post={post} />
             ))}
           </div>

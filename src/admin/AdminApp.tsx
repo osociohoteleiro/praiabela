@@ -85,7 +85,7 @@ const PROMOTION_FIELDS: FieldDef[] = [
 ];
 const POST_FIELDS: FieldDef[] = [
   { key: "title", label: "Título", type: "text" },
-  { key: "slug", label: "Slug (URL: /blog/...)", type: "text" },
+  { key: "slug", label: "Slug (URL: /blog/… — gerado automaticamente)", type: "text", slugFrom: "title" },
   { key: "category", label: "Categoria", type: "text" },
   { key: "published_at", label: "Data (AAAA-MM-DD)", type: "text" },
   { key: "cover_image", label: "Imagem de capa", type: "image" },
@@ -250,6 +250,9 @@ export default function AdminApp() {
               table="posts"
               title="Blog / Postagens"
               fields={POST_FIELDS}
+              listMode
+              sortKey="published_at"
+              sortDir="desc"
               defaults={{ title: "Nova postagem", slug: "nova-postagem", excerpt: "", content: "", cover_image: "", category: "", published_at: "", sort_order: 99 }}
             />
           )}

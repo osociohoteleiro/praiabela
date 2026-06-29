@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { Post, SectionTitle } from "../lib/types";
+import { sortPostsByDateDesc, type Post, type SectionTitle } from "../lib/types";
 import PostCard from "./PostCard";
 
 export default function BlogTeaser({
@@ -11,7 +11,7 @@ export default function BlogTeaser({
 }) {
   if (posts.length === 0) return null;
 
-  const latest = posts.slice(0, 3);
+  const latest = sortPostsByDateDesc(posts).slice(0, 3);
 
   return (
     <section id="blog" className="py-20">
