@@ -6,6 +6,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { formatPostDate } from "./PostCard";
 import ThemeStyle from "./ThemeStyle";
+import PostCTA from "./PostCTA";
 
 // Renderiza um subconjunto de Markdown (sem dependências): títulos #/##/###,
 // listas * e -, negrito **...** e linha horizontal ---.
@@ -143,7 +144,9 @@ export default function PostPage() {
 
             <div className="text-base text-gray-700">{renderMarkdown(post.content)}</div>
 
-            <div className="mt-12 border-t border-gray-100 pt-6">
+            <PostCTA contact={settings.contact} />
+
+            <div className="mt-8 border-t border-gray-100 pt-6">
               <Link to="/blog" className="text-sm font-medium text-brand hover:underline">
                 ← Ver todas as postagens
               </Link>
