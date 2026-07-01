@@ -27,6 +27,18 @@ export default function SitePage() {
       .catch((e) => setError(e.message));
   }, []);
 
+  // Após o conteúdo carregar, rola até a âncora do hash (ex.: /#acomodacoes)
+  useEffect(() => {
+    if (!content) return;
+    const hash = window.location.hash.slice(1);
+    if (!hash) return;
+    // Pequeno delay para garantir que o DOM das seções já foi pintado
+    const t = setTimeout(() => {
+      document.getElementById(hash)?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+    return () => clearTimeout(t);
+  }, [content]);
+
   if (error) {
     return (
       <div className="grid min-h-screen place-items-center bg-brand-light px-6 text-center">
